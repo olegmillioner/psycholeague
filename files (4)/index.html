@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PSYCHO LEAGUE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030308;--s1:#07070f;--s2:#0d0d1a;
+  --red:#ff0044;--red2:#cc0033;--rg:rgba(255,0,68,.28);
+  --blu:#00d4ff;--bg2:rgba(0,212,255,.2);
+  --gld:#ffcc00;--grn:#00ff88;
+  --txt:#eeeff8;--mt:#44445c;--mt2:#666688;
+  --cr:rgba(255,255,255,.04);--cb:rgba(255,255,255,.08);
+  --fh:'Orbitron',sans-serif;--fb:'Rajdhani',sans-serif;--fm:'Share Tech Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);overflow-x:hidden;cursor:none}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--red)}
+a{color:inherit;text-decoration:none}
+body::before{content:'';position:fixed;inset:0;z-index:8999;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.09) 3px,rgba(0,0,0,.09) 4px)}
+#CUR{position:fixed;z-index:9999;pointer-events:none;width:8px;height:8px;background:var(--red);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--red);top:0;left:0}
+#CUR2{position:fixed;z-index:9998;pointer-events:none;width:28px;height:28px;border:1px solid var(--red);border-radius:50%;transform:translate(-50%,-50%);opacity:.45;top:0;left:0;transition:width .12s,height .12s}
+#topbar{position:fixed;top:0;left:0;right:0;z-index:700;height:56px;background:rgba(3,3,8,.96);border-bottom:1px solid rgba(255,0,68,.18);display:flex;align-items:center;padding:0 18px;gap:12px;backdrop-filter:blur(10px)}
+.logo{font-family:var(--fh);font-size:.95rem;font-weight:900;letter-spacing:.18em}
+.logo .r{color:var(--red)}.logo .b{color:var(--blu)}
+.logo-v{font-family:var(--fm);font-size:.48rem;color:var(--blu);border:1px solid var(--blu);padding:2px 5px;opacity:.55;margin-left:5px}
+.tbr{margin-left:auto;margin-right:48px;display:flex;align-items:center;gap:10px}
+.live{display:flex;align-items:center;gap:5px;font-family:var(--fm);font-size:.52rem;color:var(--red)}
+.ldot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:pls 1.3s ease-in-out infinite}
+@keyframes pls{0%,100%{box-shadow:0 0 0 0 var(--rg)}50%{box-shadow:0 0 0 5px transparent}}
+.abtn{font-family:var(--fm);font-size:.55rem;color:var(--red);border:1px solid var(--red);padding:4px 11px;cursor:none;background:transparent;transition:all .18s}
+.abtn:hover{background:var(--red);color:#000;box-shadow:0 0 14px var(--red)}
+#hbtn{position:fixed;top:10px;right:12px;z-index:1100;width:36px;height:36px;background:var(--s1);border:1px solid var(--red);border-radius:3px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:none;transition:box-shadow .2s}
+#hbtn:hover{box-shadow:0 0 18px var(--red)}
+#hbtn span{display:block;width:18px;height:2px;background:var(--red);border-radius:1px;transition:.28s}
+#hbtn.o span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+#hbtn.o span:nth-child(2){opacity:0}
+#hbtn.o span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+#ov{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.82);opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px)}
+#ov.on{opacity:1;pointer-events:all}
+#sb{position:fixed;top:0;right:0;z-index:950;width:248px;height:100vh;background:linear-gradient(160deg,#080814,var(--bg));border-left:1px solid rgba(255,0,68,.22);box-shadow:-4px 0 36px var(--rg);transform:translateX(100%);transition:transform .36s cubic-bezier(.77,0,.18,1);display:flex;flex-direction:column;padding:70px 22px 28px}
+#sb::before{content:'// MENU';position:absolute;top:18px;left:22px;font-family:var(--fm);font-size:.48rem;letter-spacing:.22em;color:var(--red);opacity:.38}
+#sb.o{transform:translateX(0)}
+.ni{font-family:var(--fh);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mt2);padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:none;transition:color .18s,padding-left .18s;display:flex;align-items:center;gap:8px}
+.ni:hover,.ni.on{color:var(--red);padding-left:6px}
+.dot{width:4px;height:4px;border-radius:50%;background:var(--red);opacity:0;flex-shrink:0;transition:opacity .18s}
+.ni:hover .dot,.ni.on .dot{opacity:1}
+.ni-b{color:var(--blu)!important}.ni-b .dot{background:var(--blu)!important}
+.ni-b:hover,.ni-b.on{color:var(--blu)!important}
+main{padding-top:56px}
+.sec{min-height:100vh;display:none;animation:sfin .38s ease both}
+.sec.on{display:block}
+@keyframes sfin{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.si{padding:56px 36px 72px;max-width:1200px;margin:0 auto}
+@media(max-width:600px){.si{padding:44px 16px 56px}}
+.st{font-family:var(--fh);font-size:clamp(1.5rem,3.8vw,2.6rem);font-weight:900;letter-spacing:.08em;margin-bottom:4px}
+.st .r{color:var(--red)}.st .b{color:var(--blu)}
+.ss{font-family:var(--fm);font-size:.6rem;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;margin-bottom:38px}
+.sdiv{width:44px;height:2px;background:linear-gradient(90deg,var(--red),transparent);margin-bottom:40px}
+.sdiv.b{background:linear-gradient(90deg,var(--blu),transparent)}
+
+/* HOME */
+#home{position:relative;overflow:hidden}
+#hcanvas{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hw{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:76px 36px;max-width:1200px;margin:0 auto}
+.ht{font-family:var(--fh);font-size:clamp(2.4rem,7.5vw,5.5rem);font-weight:900;letter-spacing:.1em;line-height:1;margin-bottom:8px}
+.ht .r{color:var(--red);text-shadow:0 0 18px var(--rg),0 0 50px var(--rg)}
+.ht .b{color:var(--blu);text-shadow:0 0 18px var(--bg2),0 0 50px var(--bg2)}
+.hs{font-family:var(--fm);font-size:.65rem;letter-spacing:.24em;color:var(--mt2);margin-bottom:44px}
+.gl{position:relative;display:inline-block}
+.gl::before,.gl::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;height:100%}
+.gl::before{color:var(--blu);opacity:.35;animation:g1 6s 1s infinite}
+.gl::after{color:var(--red);opacity:.35;animation:g2 5s .4s infinite}
+@keyframes g1{0%,89%,100%{clip-path:inset(0);transform:none}91%{clip-path:inset(22% 0 58% 0);transform:translate(-3px)}94%{clip-path:inset(68% 0 12% 0);transform:translate(3px)}}
+@keyframes g2{0%,91%,100%{clip-path:inset(0);transform:none}93%{clip-path:inset(48% 0 38% 0);transform:translate(3px)}96%{clip-path:inset(8% 0 77% 0);transform:translate(-2px)}}
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:860px}
+@media(max-width:580px){.lgrid{grid-template-columns:1fr}}
+.lc{background:var(--cr);border:1px solid var(--cb);padding:22px;position:relative;overflow:hidden;transition:border-color .28s,box-shadow .28s}
+.lc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),transparent)}
+.lc.b::before{background:linear-gradient(90deg,var(--blu),transparent)}
+.lc:hover{border-color:var(--red);box-shadow:0 0 26px var(--rg)}
+.lc.b:hover{border-color:var(--blu);box-shadow:0 0 26px var(--bg2)}
+.lbadge{position:absolute;top:9px;right:9px;font-family:var(--fm);font-size:.46rem;color:var(--blu);border:1px solid var(--blu);padding:1px 6px;opacity:.4}
+.lname{font-family:var(--fh);font-size:.62rem;letter-spacing:.16em;color:var(--red);margin-bottom:14px;text-transform:uppercase}
+.lc.b .lname{color:var(--blu)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sv{font-family:var(--fm);font-size:1.25rem;color:var(--txt);line-height:1.1}
+.sv.big{font-size:1.8rem;color:var(--red)}
+.lc.b .sv.big{color:var(--blu)}
+.sl{font-size:.58rem;letter-spacing:.06em;color:var(--mt);text-transform:uppercase;margin-top:2px}
+
+/* NEWS */
+.ngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.nc{background:var(--cr);border:1px solid var(--cb);overflow:hidden;transition:border-color .25s,transform .25s}
+.nc:hover{border-color:var(--blu);transform:translateY(-3px)}
+.nctop{height:3px;background:linear-gradient(90deg,var(--blu),var(--red))}
+.ncb{padding:18px}
+.nccat{font-family:var(--fm);font-size:.52rem;color:var(--blu);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.nct{font-family:var(--fh);font-size:.8rem;letter-spacing:.05em;line-height:1.38;margin-bottom:8px}
+.nctxt{font-size:.9rem;color:var(--mt2);line-height:1.68;margin-bottom:12px}
+.nc-img{width:100%;max-height:200px;object-fit:cover;margin-bottom:12px;border:1px solid var(--cb)}
+.nc-video{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-bottom:12px}
+.nc-video iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.ncf{display:flex;justify-content:space-between;font-family:var(--fm);font-size:.52rem;color:var(--mt);border-top:1px solid var(--cb);padding-top:9px}
+.nca{color:var(--red)}
+.nempty{text-align:center;padding:55px 18px;font-family:var(--fm);font-size:.7rem;color:var(--mt)}
+.blink{animation:bl 1.2s step-end infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+
+/* RESULTS */
+.tabs{display:flex;gap:4px;margin-bottom:24px}
+.tab{font-family:var(--fh);font-size:.62rem;letter-spacing:.09em;padding:7px 18px;border:1px solid var(--cb);background:transparent;color:var(--mt2);cursor:none;transition:all .18s;text-transform:uppercase}
+.tab.on{border-color:var(--red);background:rgba(255,0,68,.09);color:var(--red)}
+.pane{display:none}.pane.on{display:block}
+.rt{width:100%;border-collapse:collapse;max-width:880px}
+.rt th{font-family:var(--fh);font-size:.52rem;letter-spacing:.1em;color:var(--mt);text-align:left;padding:9px 11px;border-bottom:1px solid var(--cb);text-transform:uppercase}
+.rt td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,.034);font-size:.88rem;transition:background .18s}
+.rt tr:hover td{background:rgba(255,255,255,.022)}
+.rk{font-family:var(--fm);font-size:.68rem;color:var(--mt);width:28px}
+.rn{font-family:var(--fh);font-size:.65rem;letter-spacing:.05em}
+.rp{font-family:var(--fm);color:var(--red);font-weight:700}
+.top1 td{background:rgba(255,204,0,.05)}.top1 .rn{color:var(--gld)}
+.ml{display:flex;flex-direction:column;gap:9px;max-width:680px}
+.mc{background:var(--cr);border:1px solid var(--cb);padding:12px 18px;display:flex;align-items:center;gap:14px;transition:border-color .18s}
+.mc:hover{border-color:rgba(255,0,68,.28)}
+.mcd{font-family:var(--fm);font-size:.54rem;color:var(--mt);min-width:72px}
+.mct{flex:1;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mtn{font-family:var(--fh);font-size:.65rem;letter-spacing:.05em;flex:1}
+.mtn.r{text-align:right}
+.mts{font-family:var(--fm);font-size:1.05rem;padding:3px 13px;background:rgba(255,255,255,.045);min-width:56px;text-align:center}
+
+/* TROPHIES */
+.lrow{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:52px}
+@media(max-width:660px){.lrow{grid-template-columns:1fr}}
+.lcard{background:var(--cr);border:1px solid var(--cb);padding:24px}
+.lcard.gold{border-color:rgba(255,204,0,.18)}.lcard.cbl{border-color:rgba(0,212,255,.18)}
+.lh{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.lic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(255,204,0,.09);border:1px solid rgba(255,204,0,.18)}
+.lic.b{background:rgba(0,212,255,.09);border-color:rgba(0,212,255,.18)}
+.ltit{font-family:var(--fh);font-size:.86rem;letter-spacing:.09em}
+.lown{font-family:var(--fm);font-size:.55rem;color:var(--mt);margin-top:3px}
+.trow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.tr{display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,204,0,.055);border:1px solid rgba(255,204,0,.13);padding:9px 11px;min-width:86px;transition:all .2s;cursor:none}
+.tr:hover{border-color:var(--gld);background:rgba(255,204,0,.1)}
+.tico{font-size:1.3rem}.tn{font-family:var(--fh);font-size:.45rem;letter-spacing:.05em;color:var(--gld);text-align:center;line-height:1.3}
+.tt{font-family:var(--fm);font-size:.48rem;color:var(--mt)}
+.lst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-top:14px}
+.ls{background:rgba(255,255,255,.028);padding:9px 11px}
+.lsv{font-family:var(--fm);font-size:.96rem;color:var(--txt)}.lsl{font-size:.58rem;color:var(--mt);margin-top:2px}
+.tltit{font-family:var(--fh);font-size:.96rem;letter-spacing:.14em;color:var(--txt);margin:38px 0 24px}
+.tl{position:relative;padding-left:26px}
+.tl::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--red),var(--blu),transparent)}
+.tli{position:relative;margin-bottom:26px;padding-left:18px}
+.tli::before{content:'';position:absolute;left:-6px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--red)}
+.tli.b::before{border-color:var(--blu)}
+.tld{font-family:var(--fm);font-size:.56rem;color:var(--red);margin-bottom:3px}
+.tli.b .tld{color:var(--blu)}
+.tlt{font-size:.88rem;color:var(--mt2);line-height:1.58}.tlt strong{color:var(--txt)}
+
+/* PLAYERS */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:14px}
+.pc{background:var(--cr);border:1px solid var(--cb);overflow:hidden;transition:all .28s;cursor:none}
+.pc:hover{border-color:var(--blu);transform:translateY(-4px);box-shadow:0 9px 36px var(--bg2)}
+.pch{position:relative;height:84px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pcbg{position:absolute;inset:0;opacity:.38}
+.pobr{position:absolute;top:7px;left:7px;font-family:var(--fm);font-size:.6rem;padding:2px 7px;background:rgba(255,204,0,.28);color:var(--gld);border:1px solid rgba(255,204,0,.35)}
+.pico{font-size:1.9rem;position:relative;z-index:1}
+.pc-photo{width:100%;height:84px;object-fit:cover;position:absolute;inset:0;opacity:.6}
+.pcb{padding:13px}
+.pname{font-family:var(--fh);font-size:.72rem;letter-spacing:.09em;margin-bottom:3px}
+.prole{font-family:var(--fm);font-size:.52rem;color:var(--red);letter-spacing:.09em;margin-bottom:9px}
+.prow{display:flex;justify-content:space-between;font-size:.76rem;padding:2px 0}
+.pk{color:var(--mt)}.pv{font-family:var(--fm);font-size:.67rem;color:var(--blu)}
+.pstars{margin-top:9px;padding-top:9px;border-top:1px solid var(--cb)}
+.pstar{display:flex;justify-content:space-between;font-size:.7rem;padding:1px 0}
+.psn{color:var(--txt)}.psr{font-family:var(--fm);font-size:.62rem;color:var(--gld)}
+.pibtn{width:100%;margin-top:9px;font-family:var(--fm);font-size:.52rem;color:var(--red);border:1px solid var(--red);background:transparent;padding:5px;cursor:none;transition:all .18s}
+.pibtn:hover{background:var(--red);color:#000}
+#sqm{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+#sqm.on{display:flex}
+.sqin{position:relative;max-width:880px;width:92%;background:var(--s1);border:1px solid var(--red)}
+.sqcl{position:absolute;top:10px;right:12px;font-family:var(--fm);font-size:.65rem;color:var(--mt);cursor:none;padding:3px 9px;border:1px solid var(--cb);transition:color .2s;z-index:1}
+.sqcl:hover{color:var(--red)}
+.sqimg{width:100%;display:block;max-height:90vh;object-fit:contain}
+.sqcap{padding:12px 18px;font-family:var(--fh);font-size:.65rem;color:var(--red)}
+
+/* GAME */
+.gw{display:flex;flex-direction:column;align-items:center;max-width:780px;margin:0 auto}
+.gbar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--s1);border:1px solid var(--red);border-bottom:none;font-family:var(--fm);font-size:.6rem;color:var(--red)}
+.gdots{display:flex;gap:6px}.gd{width:9px;height:9px;border-radius:50%}
+.gd.r{background:#ff5f57}.gd.y{background:#febc2e}.gd.g{background:#28c840}
+#pong{border:1px solid var(--red);display:block;background:#020206;width:100%}
+.gfoot{width:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--s1);border:1px solid var(--red);border-top:none}
+.gbtn{font-family:var(--fm);font-size:.6rem;color:var(--red);background:transparent;border:1px solid var(--red);padding:5px 14px;cursor:none;transition:all .18s}
+.gbtn:hover,.gbtn.on{background:var(--red);color:#000;box-shadow:0 0 13px var(--red)}
+.gnote{font-family:var(--fm);font-size:.54rem;color:var(--mt);margin-left:auto}
+.gsc{display:flex;align-items:center;gap:18px;margin:0 auto 14px}
+.gss{font-family:var(--fh);font-size:.65rem;letter-spacing:.09em;text-align:center}
+.gsv{font-family:var(--fm);font-size:2.2rem;line-height:1}
+.gsv.rc{color:var(--red)}.gsv.bc{color:var(--blu)}
+.gsp{font-family:var(--fm);font-size:1.4rem;color:var(--mt)}
+
+/* APPLICATIONS */
+#apply{background:radial-gradient(ellipse 50% 40% at 40% 60%,rgba(0,255,136,.05),transparent)}
+.app-form{max-width:520px}
+.rf{display:flex;flex-direction:column;gap:14px}
+.fi{display:flex;flex-direction:column;gap:5px}
+.fi label{font-family:var(--fm);font-size:.58rem;letter-spacing:.11em;color:var(--mt);text-transform:uppercase}
+.fi input,.fi select,.fi textarea{background:var(--cr);border:1px solid var(--cb);color:var(--txt);font-family:var(--fb);font-size:.92rem;padding:9px 13px;outline:none;transition:border-color .18s}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--grn);box-shadow:0 0 0 2px rgba(0,255,136,.15)}
+.fi select option{background:#07070f}
+.rbtn{font-family:var(--fh);font-size:.65rem;letter-spacing:.11em;padding:11px 26px;background:linear-gradient(90deg,var(--grn),#00cc66);border:none;color:#000;cursor:none;transition:all .22s;text-transform:uppercase;margin-top:6px;font-weight:700}
+.rbtn:hover{box-shadow:0 0 18px var(--grn);transform:translateY(-1px)}
+.app-info{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.12);padding:14px 16px;margin-top:18px;font-size:.84rem;color:var(--mt2);line-height:1.68}
+.app-info strong{color:var(--grn)}
+.app-success{display:none;text-align:center;padding:30px;font-family:var(--fm)}
+.app-success .big{font-size:2rem;margin-bottom:12px}
+
+/* REGISTER */
+#register{background:radial-gradient(ellipse 48% 38% at 50% 58%,rgba(0,212,255,.06),transparent)}
+.rinfo{background:rgba(0,212,255,.044);border:1px solid rgba(0,212,255,.13);padding:14px 16px;margin-top:18px;font-size:.84rem;color:var(--mt2);line-height:1.68}
+.rinfo strong{color:var(--blu)}
+.rsucc{display:none;text-align:center;padding:26px;font-family:var(--fm)}
+.rsucc .big{font-size:1.9rem;margin-bottom:10px}
+
+/* ADMIN */
+#adm{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.97);display:none;overflow-y:auto}
+#adm.on{display:block}
+.adlay{min-height:100vh;display:grid;grid-template-columns:220px 1fr}
+@media(max-width:680px){.adlay{grid-template-columns:1fr}}
+.adnav{background:var(--s1);border-right:1px solid var(--cb);padding:20px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.adnavt{font-family:var(--fh);font-size:.52rem;letter-spacing:.18em;color:var(--red);padding:0 18px 14px;border-bottom:1px solid var(--cb);margin-bottom:6px}
+.an{font-family:var(--fh);font-size:.65rem;letter-spacing:.09em;padding:10px 18px;cursor:none;color:var(--mt2);transition:all .18s;display:block;text-transform:uppercase}
+.an:hover,.an.on{color:var(--red);background:rgba(255,0,68,.055);padding-left:24px}
+.an.ex{color:var(--mt)!important;border-top:1px solid var(--cb);margin-top:8px;padding-top:14px}
+.an .badge{background:var(--red);color:#fff;font-size:.48rem;padding:1px 5px;border-radius:8px;margin-left:6px;display:inline-block}
+.adcon{padding:32px;max-width:920px}
+@media(max-width:680px){.adnav{display:flex;flex-direction:row;height:auto;position:static;overflow-x:auto}.adnavt{display:none}.an{white-space:nowrap}.adcon{padding:18px}}
+.adsec{display:none}.adsec.on{display:block}
+.adtit{font-family:var(--fh);font-size:1.1rem;letter-spacing:.09em;margin-bottom:4px}
+.adsub{font-family:var(--fm);font-size:.58rem;color:var(--mt);margin-bottom:28px;letter-spacing:.13em}
+.af{display:grid;gap:13px;max-width:600px;margin-bottom:28px;background:var(--cr);border:1px solid var(--cb);padding:22px}
+.af h3{font-family:var(--fh);font-size:.66rem;letter-spacing:.11em;color:var(--red);margin-bottom:2px;grid-column:1/-1}
+.afrow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.af .fi input,.af .fi textarea,.af .fi select{background:#030308;border:1px solid var(--cb);color:var(--txt);font-family:var(--fb);font-size:.88rem;padding:7px 11px;outline:none;width:100%;transition:border-color .18s}
+.af .fi textarea{min-height:76px;resize:vertical}
+.af .fi input:focus,.af .fi textarea:focus,.af .fi select:focus{border-color:var(--red)}
+.af .fi select option{background:#07070f}
+.afbtn{font-family:var(--fh);font-size:.62rem;letter-spacing:.09em;padding:9px 22px;background:var(--red);border:none;color:#fff;cursor:none;transition:all .18s;text-transform:uppercase}
+.afbtn:hover{box-shadow:0 0 14px var(--red)}
+.afbtn.g{background:var(--grn);color:#000}
+.afbtn.g:hover{box-shadow:0 0 14px var(--grn)}
+/* upload area */
+.up-area{border:2px dashed var(--cb);padding:18px;text-align:center;cursor:none;transition:border-color .18s;position:relative}
+.up-area:hover{border-color:var(--red)}
+.up-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.up-area-txt{font-family:var(--fm);font-size:.62rem;color:var(--mt)}
+.up-preview{max-width:200px;max-height:120px;margin-top:8px;border:1px solid var(--cb)}
+/* admin list */
+.alist{display:flex;flex-direction:column;gap:7px;max-width:700px}
+.ai{background:var(--cr);border:1px solid var(--cb);padding:12px 16px;display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.ai.pending{border-left:3px solid var(--gld)}
+.ai.accepted{border-left:3px solid var(--grn)}
+.ai.rejected{border-left:3px solid var(--mt)}
+.aib{flex:1}
+.ait{font-family:var(--fh);font-size:.67rem;letter-spacing:.05em;color:var(--txt);margin-bottom:3px}
+.aim{font-family:var(--fm);font-size:.54rem;color:var(--mt)}
+.adel{font-family:var(--fm);font-size:.54rem;color:var(--red);border:1px solid var(--red);padding:3px 9px;cursor:none;background:transparent;transition:all .18s;flex-shrink:0}
+.adel:hover{background:var(--red);color:#000}
+.aacc{font-family:var(--fm);font-size:.54rem;color:var(--grn);border:1px solid var(--grn);padding:3px 9px;cursor:none;background:transparent;transition:all .18s;flex-shrink:0}
+.aacc:hover{background:var(--grn);color:#000}
+.arej{font-family:var(--fm);font-size:.54rem;color:var(--mt);border:1px solid var(--mt);padding:3px 9px;cursor:none;background:transparent;transition:all .18s;flex-shrink:0}
+.aempty{font-family:var(--fm);font-size:.67rem;color:var(--mt);padding:18px 0}
+.abtn-row{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+/* edit modal */
+#edit-modal{position:fixed;inset:0;z-index:4500;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center}
+#edit-modal.on{display:flex}
+.edit-box{width:560px;max-width:95%;background:var(--s1);border:1px solid var(--red);padding:28px;max-height:90vh;overflow-y:auto}
+.edit-title{font-family:var(--fh);font-size:.85rem;color:var(--red);margin-bottom:18px}
+/* login */
+#alog{position:fixed;inset:0;z-index:4000;background:rgba(3,3,8,.98);display:flex;align-items:center;justify-content:center}
+#alog.h{display:none}
+.lbox{width:350px;background:var(--s1);border:1px solid rgba(255,0,68,.28);padding:34px;box-shadow:0 0 56px var(--rg)}
+.lbox::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--red),var(--blu));margin-bottom:26px}
+.ltit{font-family:var(--fh);font-size:.96rem;letter-spacing:.11em;margin-bottom:3px}
+.lsub{font-family:var(--fm);font-size:.56rem;color:var(--mt);margin-bottom:22px}
+.lerr{font-family:var(--fm);font-size:.6rem;color:var(--red);margin-top:9px;display:none}
+.lback{font-family:var(--fm);font-size:.56rem;color:var(--mt);cursor:none;margin-top:14px;text-align:center;display:block;transition:color .18s}
+.lback:hover{color:var(--red)}
+/* toast */
+#tw{position:fixed;bottom:18px;right:18px;z-index:9990;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--s1);border:1px solid var(--blu);border-left:3px solid var(--blu);padding:11px 15px;font-family:var(--fm);font-size:.63rem;max-width:270px;animation:tin .28s ease;box-shadow:0 4px 18px var(--bg2)}
+.toast.e{border-color:var(--red);border-left-color:var(--red)}
+.toast.s{border-color:var(--grn);border-left-color:var(--grn)}
+@keyframes tin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.ft{padding:18px 36px;border-top:1px solid var(--cb);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;font-family:var(--fm);font-size:.52rem;color:var(--mt)}
+.ft .r{color:var(--red)}.ft .b{color:var(--blu)}
+</style>
+</head>
+<body>
+<div id="CUR"></div><div id="CUR2"></div><div id="tw"></div>
+
+<header id="topbar">
+  <div class="logo">PSYCHO<span class="r">&nbsp;LEAGUE</span></div>
+  <div class="logo-v">v4.0</div>
+  <div class="tbr">
+    <div class="live"><div class="ldot"></div>LIVE</div>
+    <button class="abtn" onclick="openAdmin()">⚙ ADMIN</button>
+  </div>
+</header>
+
+<button id="hbtn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+<div id="ov" onclick="closeMenu()"></div>
+<nav id="sb">
+  <a class="ni on"  data-s="home"     onclick="go('home',this);return false" href="#"><span class="dot"></span>⚽ Главная</a>
+  <a class="ni"     data-s="news"     onclick="go('news',this);return false" href="#"><span class="dot"></span>📰 Новости</a>
+  <a class="ni"     data-s="results"  onclick="go('results',this);return false" href="#"><span class="dot"></span>📊 Результаты</a>
+  <a class="ni"     data-s="trophies" onclick="go('trophies',this);return false" href="#"><span class="dot"></span>🏆 Трофеи</a>
+  <a class="ni"     data-s="players"  onclick="go('players',this);return false" href="#"><span class="dot"></span>👥 Игроки</a>
+  <a class="ni"     data-s="game"     onclick="go('game',this);return false" href="#"><span class="dot"></span>🎮 Игра</a>
+  <a class="ni"     data-s="apply"    onclick="go('apply',this);return false" href="#"><span class="dot"></span>📋 Заявка в лигу</a>
+  <a class="ni"     data-s="register" onclick="go('register',this);return false" href="#"><span class="dot"></span>🔔 Подписка</a>
+  <a class="ni ni-b" onclick="openAdmin();closeMenu();return false" href="#"><span class="dot"></span>⚙ Панель</a>
+</nav>
+
+<main>
+<!-- HOME -->
+<section id="home" class="sec on">
+  <canvas id="hcanvas"></canvas>
+  <div class="hw">
+    <p class="hs">// EA FC MOBILE · OFFICIAL COMMUNITY HUB</p>
+    <h1 class="ht"><span class="gl r" data-t="PSYCHO">PSYCHO</span><br><span class="gl b" data-t="LEAGUE">LEAGUE</span></h1>
+    <div class="lgrid" style="margin-top:36px">
+      <div class="lc">
+        <div class="lbadge">PL-I</div>
+        <div class="lname">⚡ Psycho League · PaNdA</div>
+        <div class="sg">
+          <div><div class="sv big"><span data-n="85">85</span></div><div class="sl">Участников</div></div>
+          <div><div class="sv"><span data-n="240712">240 712</span></div><div class="sl">Голов</div></div>
+          <div><div class="sv"><span data-n="12116">12 116</span></div><div class="sl">ОБЩ лиги</div></div>
+          <div><div class="sv"><span data-n="161">161</span></div><div class="sl">Побед</div></div>
+        </div>
+      </div>
+      <div class="lc b">
+        <div class="lbadge">PL-II</div>
+        <div class="lname">🔥 Psycho League 2 · Psycho</div>
+        <div class="sg">
+          <div><div class="sv big"><span data-n="100">100</span></div><div class="sl">Участников</div></div>
+          <div><div class="sv"><span data-n="98871">98 871</span></div><div class="sl">Голов</div></div>
+          <div><div class="sv"><span data-n="12061">12 061</span></div><div class="sl">ОБЩ лиги</div></div>
+          <div><div class="sv"><span data-n="40">40</span></div><div class="sl">Побед</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news" class="sec">
+  <div class="si">
+    <h2 class="st">НО<span class="b">ВОС</span>ТИ</h2>
+    <p class="ss">// ПСИХО ЛИГА · ОФИЦИАЛЬНЫЙ КАНАЛ</p>
+    <div class="sdiv b"></div>
+    <div class="ngrid" id="ngrid"><div class="nempty">Загрузка<span class="blink">_</span></div></div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="sec">
+  <div class="si">
+    <h2 class="st">РЕ<span class="r">ЗУЛ</span>ЬТАТЫ</h2>
+    <p class="ss">// ТУРНИРЫ И МАТЧИ</p>
+    <div class="sdiv"></div>
+    <div class="tabs">
+      <button class="tab on" onclick="stab('tb',this)">📊 ТАБЛИЦА</button>
+      <button class="tab" onclick="stab('mb',this)">⚽ МАТЧИ</button>
+    </div>
+    <div class="pane on" id="tb"><table class="rt"><thead><tr><th>#</th><th>Игрок</th><th>И</th><th>В</th><th>Н</th><th>П</th><th>Г</th><th>Очки</th></tr></thead><tbody id="stb"></tbody></table></div>
+    <div class="pane" id="mb"><div class="ml" id="mlist"></div></div>
+  </div>
+</section>
+
+<!-- TROPHIES -->
+<section id="trophies" class="sec">
+  <div class="si">
+    <h2 class="st">ТРО<span class="r">ФЕИ</span></h2>
+    <p class="ss">// ДОСТИЖЕНИЯ И ИСТОРИЯ ЛИГИ</p>
+    <div class="sdiv"></div>
+    <div class="lrow">
+      <div class="lcard gold">
+        <div class="lh"><div class="lic">🐉</div><div><div class="ltit">Psycho League</div><div class="lown">Владелец: PaNdA · R.Madrid · EUW</div></div></div>
+        <div class="trow">
+          <div class="tr"><div class="tico">🛡️</div><div class="tn">Мощная VS Атака</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">🎯</div><div class="tn">Фанаты квестов</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">📺</div><div class="tn">Преданная аудитория</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">💰</div><div class="tn">Престижный клуб</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">⚽</div><div class="tn">Лучшие бомбардиры</div><div class="tt">TIER V</div></div>
+        </div>
+        <div class="lst">
+          <div class="ls"><div class="lsv">240 712</div><div class="lsl">Голов</div></div>
+          <div class="ls"><div class="lsv">769</div><div class="lsl">Квестов</div></div>
+          <div class="ls"><div class="lsv">161</div><div class="lsl">Побед</div></div>
+          <div class="ls"><div class="lsv">12 116</div><div class="lsl">ОБЩ лиги</div></div>
+          <div class="ls"><div class="lsv">494 390</div><div class="lsl">Активность</div></div>
+          <div class="ls"><div class="lsv">20.01.2025</div><div class="lsl">Основана</div></div>
+        </div>
+      </div>
+      <div class="lcard cbl">
+        <div class="lh"><div class="lic b">🦁</div><div><div class="ltit" style="color:var(--blu)">Psycho League 2</div><div class="lown">Владелец: Psycho · FC Bayern · France</div></div></div>
+        <div class="trow">
+          <div class="tr"><div class="tico">⚽</div><div class="tn">Лучшие бомбардиры</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">👥</div><div class="tn">Процветающая лига</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">👑</div><div class="tn">Лучшие из лучших</div><div class="tt">TIER V</div></div>
+          <div class="tr"><div class="tico">💰</div><div class="tn">Престижный клуб</div><div class="tt">TIER V</div></div>
+          <div class="tr" style="border-color:rgba(150,50,255,.25)"><div class="tico">⚽</div><div class="tn" style="color:#aa66ff">Лучшие бомбардиры</div><div class="tt">TIER IV</div></div>
+        </div>
+        <div class="lst">
+          <div class="ls"><div class="lsv">98 871</div><div class="lsl">Голов</div></div>
+          <div class="ls"><div class="lsv">130</div><div class="lsl">Квестов</div></div>
+          <div class="ls"><div class="lsv">40</div><div class="lsl">Побед</div></div>
+          <div class="ls"><div class="lsv">12 061</div><div class="lsl">ОБЩ лиги</div></div>
+          <div class="ls"><div class="lsv">225 815</div><div class="lsl">Активность</div></div>
+          <div class="ls"><div class="lsv">31.01.2026</div><div class="lsl">Основана</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tltit">// ИСТОРИЯ ЛИГИ</div>
+    <div class="tl">
+      <div class="tli"><div class="tld">20 января 2025</div><div class="tlt"><strong>Psycho League основана.</strong> PaNdA создаёт лигу на EUW. Первые 10 участников за неделю.</div></div>
+      <div class="tli"><div class="tld">Февраль 2025</div><div class="tlt"><strong>Первый турнир.</strong> 20 участников. Трофей «Фанаты квестов V».</div></div>
+      <div class="tli"><div class="tld">Апрель 2025</div><div class="tlt"><strong>50 участников.</strong> Трофей «Мощная VS Атака V». PL в топ лиг EUW.</div></div>
+      <div class="tli"><div class="tld">Июль 2025</div><div class="tlt"><strong>100 000 голов!</strong> Трофеи «Преданная аудитория V» и «Престижный клуб V».</div></div>
+      <div class="tli"><div class="tld">Декабрь 2025</div><div class="tlt"><strong>Рейтинг 121, ОБЩ 12 116.</strong> 161 победа. 240 712 голов. Элитный статус.</div></div>
+      <div class="tli b"><div class="tld">31 января 2026</div><div class="tlt"><strong>Открытие Psycho League 2.</strong> Владелец Psycho, клуб FC Bayern.</div></div>
+      <div class="tli b"><div class="tld">Апрель 2026</div><div class="tlt"><strong>PL2 — 100 участников.</strong> Суммарно 185 игроков в обеих лигах.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYERS -->
+<section id="players" class="sec">
+  <div class="si">
+    <h2 class="st">НА<span class="b">ШИ</span> ИГРОКИ</h2>
+    <p class="ss">// СОСТАВЫ УЧАСТНИКОВ ЛИГИ</p>
+    <div class="sdiv b"></div>
+    <div class="pgrid" id="pgrid"><div class="nempty">Загрузка<span class="blink">_</span></div></div>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="sec">
+  <div class="si">
+    <h2 class="st" style="margin-bottom:4px">ПИН<span class="r">Г-ПОНГ</span></h2>
+    <p class="ss">// ARCADE</p>
+    <div class="sdiv"></div>
+    <div class="gsc">
+      <div class="gss"><div class="gsv rc" id="scpu">0</div><div style="font-family:var(--fm);font-size:.56rem;color:var(--mt)">CPU</div></div>
+      <div class="gsp">:</div>
+      <div class="gss"><div class="gsv bc" id="sply">0</div><div style="font-family:var(--fm);font-size:.56rem;color:var(--mt)">ВЫ</div></div>
+    </div>
+    <div class="gw">
+      <div class="gbar"><span id="gst">Нажмите СТАРТ</span><div class="gdots"><div class="gd r"></div><div class="gd y"></div><div class="gd g"></div></div></div>
+      <canvas id="pong" width="700" height="420"></canvas>
+      <div class="gfoot">
+        <button class="gbtn on" id="gbstart" onclick="pongStart()">▶ СТАРТ</button>
+        <button class="gbtn" onclick="pongReset()">↺ СБРОС</button>
+        <span class="gnote">Мышь / тач — ракетка (синяя)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLY -->
+<section id="apply" class="sec">
+  <div class="si">
+    <h2 class="st">ЗА<span style="color:var(--grn)">ЯВ</span>КА</h2>
+    <p class="ss">// ВСТУПЛЕНИЕ В ЛИГУ</p>
+    <div class="sdiv" style="background:linear-gradient(90deg,var(--grn),transparent)"></div>
+    <div class="app-form">
+      <div id="app-wrap">
+        <form class="rf" onsubmit="doApply(event)">
+          <div class="fi"><label>Ник в игре *</label><input type="text" id="ap-name" placeholder="Твой ник" required></div>
+          <div class="fi"><label>ОБЩ (рейтинг команды) *</label><input type="number" id="ap-obr" placeholder="120" min="1" max="999" required></div>
+          <div class="fi"><label>Основной клуб</label><input type="text" id="ap-club" placeholder="Real Madrid"></div>
+          <div class="fi"><label>Любимая схема</label><input type="text" id="ap-form" placeholder="4-3-3"></div>
+          <div class="fi"><label>В какую лигу хочешь?</label>
+            <select id="ap-league">
+              <option value="PL1">Psycho League (PL1)</option>
+              <option value="PL2">Psycho League 2 (PL2)</option>
+            </select>
+          </div>
+          <div class="fi"><label>Telegram / контакт</label><input type="text" id="ap-contact" placeholder="@username"></div>
+          <div class="fi"><label>О себе (необязательно)</label><textarea id="ap-about" placeholder="Расскажи о себе..." style="min-height:60px"></textarea></div>
+          <button type="submit" class="rbtn">ОТПРАВИТЬ ЗАЯВКУ</button>
+        </form>
+        <div class="app-info">
+          <strong>Как это работает:</strong><br>
+          📋 Заполни форму и отправь заявку<br>
+          👀 Администратор рассмотрит её в панели управления<br>
+          ✅ При принятии получишь уведомление<br>
+          ⚡ Среднее время ответа — 24 часа
+        </div>
+      </div>
+      <div class="app-success" id="app-success">
+        <div class="big">📋</div>
+        <p style="color:var(--grn);font-size:.85rem">Заявка отправлена!</p>
+        <p style="margin-top:8px;color:var(--mt);font-size:.72rem">Ожидай ответа от администратора.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTER -->
+<section id="register" class="sec">
+  <div class="si">
+    <h2 class="st">ПОД<span class="b">ПИСЬ</span>КА</h2>
+    <p class="ss">// УВЕДОМЛЕНИЯ О НОВОСТЯХ</p>
+    <div class="sdiv b"></div>
+    <div id="rfwrap">
+      <form class="rf" style="max-width:460px" onsubmit="doReg(event)">
+        <div class="fi"><label>Ник / Имя *</label><input type="text" id="rname" placeholder="Твой ник" required></div>
+        <div class="fi"><label>Email (необязательно)</label><input type="email" id="remail" placeholder="email@example.com"></div>
+        <button type="submit" class="rbtn" style="background:linear-gradient(90deg,var(--red),var(--red2));color:#fff">ПОДПИСАТЬСЯ</button>
+      </form>
+      <div class="rinfo"><strong>Что ты получишь:</strong><br>🔔 Браузерные push при публикации новостей<br>📊 Уведомления о результатах турниров</div>
+    </div>
+    <div class="rsucc" id="rsucc"><div class="big">✅</div><p style="color:var(--blu)">Подписка оформлена!</p></div>
+  </div>
+</section>
+
+<div class="ft">
+  <span>PSYCHO <span class="r">LEAGUE</span> &copy; 2025–2026</span>
+  <span>EA FC MOBILE · EUW</span>
+  <span>Java · <span class="b">Port 8080</span></span>
+</div>
+</main>
+
+<!-- SQUAD MODAL -->
+<div id="sqm"><div class="sqin"><button class="sqcl" onclick="closeSq()">✕ ЗАКРЫТЬ</button><img class="sqimg" id="sqimg" src="" alt="Состав"><div class="sqcap" id="sqcap"></div></div></div>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal">
+  <div class="edit-box">
+    <div class="edit-title" id="edit-title">РЕДАКТИРОВАТЬ</div>
+    <div id="edit-body"></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="afbtn" onclick="saveEdit()">СОХРАНИТЬ</button>
+      <button class="afbtn" style="background:transparent;border:1px solid var(--mt);color:var(--mt)" onclick="closeEdit()">ОТМЕНА</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adm">
+  <div id="alog">
+    <div class="lbox">
+      <div class="ltit">ADMIN PANEL</div>
+      <div class="lsub">// PSYCHO LEAGUE CONTROL</div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="fi"><label>Логин</label><input type="text" id="auser" placeholder="Panda"></div>
+        <div class="fi"><label>Пароль</label><input type="password" id="apass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="afbtn" style="width:100%;padding:11px" onclick="doLogin()">ВОЙТИ</button>
+        <div class="lerr" id="lerr">Неверный логин или пароль</div>
+        <span class="lback" onclick="closeAdmin()">← Назад на сайт</span>
+      </div>
+    </div>
+  </div>
+  <div id="apanel" style="display:none">
+    <div class="adlay">
+      <nav class="adnav">
+        <div class="adnavt">// PSYCHO LEAGUE</div>
+        <a class="an on" onclick="aTab('as-news',this)">📰 Новости</a>
+        <a class="an" onclick="aTab('as-res',this)">📊 Результаты</a>
+        <a class="an" onclick="aTab('as-ply',this)">👥 Игроки</a>
+        <a class="an" id="an-apps" onclick="aTab('as-apps',this)">📋 Заявки</a>
+        <a class="an" onclick="aTab('as-usr',this)">🔔 Подписчики</a>
+        <a class="an ex" onclick="aLogout()">✕ Выйти</a>
+      </nav>
+      <div class="adcon">
+
+        <!-- NEWS ADMIN -->
+        <div class="adsec on" id="as-news">
+          <div class="adtit">НОВОСТИ</div>
+          <div class="adsub">// ПУБЛИКАЦИИ — ТЕКСТ + ФОТО + ВИДЕО</div>
+          <div class="af">
+            <h3>+ Добавить / Редактировать новость</h3>
+            <div class="fi"><label>Заголовок</label><input type="text" id="ntit" placeholder="Заголовок новости"></div>
+            <div class="fi"><label>Текст</label><textarea id="nbod" placeholder="Текст публикации..."></textarea></div>
+            <div class="afrow">
+              <div class="fi"><label>Категория</label>
+                <select id="ncat"><option>НОВОСТЬ</option><option>ТУРНИР</option><option>АНОНС</option><option>РЕКОРД</option></select>
+              </div>
+              <div class="fi"><label>Автор</label><input type="text" id="naut" placeholder="PaNdA"></div>
+            </div>
+            <!-- PHOTO UPLOAD -->
+            <div class="fi">
+              <label>Фото (необязательно)</label>
+              <div class="up-area" id="news-photo-area">
+                <input type="file" id="news-photo-file" accept="image/*" onchange="previewUpload(this,'news-photo-prev','news-photo-url')">
+                <div class="up-area-txt">📷 Нажми или перетащи фото</div>
+                <img id="news-photo-prev" class="up-preview" style="display:none">
+                <input type="hidden" id="news-photo-url">
+              </div>
+            </div>
+            <!-- VIDEO URL -->
+            <div class="fi"><label>Видео YouTube (ссылка, необязательно)</label><input type="text" id="nvid" placeholder="https://youtube.com/watch?v=..."></div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <button class="afbtn" onclick="postNews()">ОПУБЛИКОВАТЬ</button>
+              <span id="edit-news-id" style="display:none"></span>
+              <button class="afbtn" id="cancel-edit-news" style="display:none;background:transparent;border:1px solid var(--mt);color:var(--mt)" onclick="cancelEditNews()">ОТМЕНА</button>
+            </div>
+          </div>
+          <div class="alist" id="nalist"></div>
+        </div>
+
+        <!-- RESULTS ADMIN -->
+        <div class="adsec" id="as-res">
+          <div class="adtit">РЕЗУЛЬТАТЫ</div>
+          <div class="adsub">// МАТЧИ И ТАБЛИЦА</div>
+          <div class="af">
+            <h3>+ Добавить матч</h3>
+            <div class="afrow">
+              <div class="fi"><label>Команда 1</label><input type="text" id="rt1" placeholder="PaNdA"></div>
+              <div class="fi"><label>Команда 2</label><input type="text" id="rt2" placeholder="Psycho"></div>
+            </div>
+            <div class="afrow">
+              <div class="fi"><label>Счёт 1</label><input type="number" id="rs1" value="0" min="0"></div>
+              <div class="fi"><label>Счёт 2</label><input type="number" id="rs2" value="0" min="0"></div>
+            </div>
+            <div class="fi"><label>Дата</label><input type="date" id="rdate"></div>
+            <button class="afbtn" onclick="postResult()">ДОБАВИТЬ</button>
+          </div>
+          <div class="alist" id="ralist"></div>
+        </div>
+
+        <!-- PLAYERS ADMIN -->
+        <div class="adsec" id="as-ply">
+          <div class="adtit">ИГРОКИ</div>
+          <div class="adsub">// КАРТОЧКИ + ФОТО СОСТАВА</div>
+          <div class="af">
+            <h3>+ Добавить игрока</h3>
+            <div class="afrow">
+              <div class="fi"><label>Ник</label><input type="text" id="pnm" placeholder="PaNdA"></div>
+              <div class="fi"><label>Роль</label><input type="text" id="prl" placeholder="Владелец PL"></div>
+            </div>
+            <div class="afrow">
+              <div class="fi"><label>Клуб</label><input type="text" id="pcl" placeholder="Real Madrid"></div>
+              <div class="fi"><label>ОБЩ</label><input type="number" id="pob" value="122" min="1" max="999"></div>
+            </div>
+            <div class="afrow">
+              <div class="fi"><label>Схема</label><input type="text" id="pfo" placeholder="3-4-1-2"></div>
+              <div class="fi"><label>Монеты</label><input type="text" id="pco" placeholder="85.59B"></div>
+            </div>
+            <div class="fi"><label>Иконка (эмодзи)</label><input type="text" id="pic" placeholder="⚽" maxlength="4"></div>
+            <div class="fi"><label>Топ игроки: Имя Позиция ОБЩ (через запятую)</label>
+              <input type="text" id="pst" placeholder="Forlán ЛВ 122, Hazard ЛВ 122"></div>
+            <!-- PHOTO UPLOAD FOR PLAYER -->
+            <div class="fi">
+              <label>Фото состава</label>
+              <div class="up-area">
+                <input type="file" id="player-photo-file" accept="image/*" onchange="previewUpload(this,'player-photo-prev','player-photo-url')">
+                <div class="up-area-txt">📷 Загрузи скрин состава</div>
+                <img id="player-photo-prev" class="up-preview" style="display:none">
+                <input type="hidden" id="player-photo-url">
+              </div>
+            </div>
+            <button class="afbtn" onclick="postPlayer()">ДОБАВИТЬ ИГРОКА</button>
+          </div>
+          <div class="alist" id="palist"></div>
+        </div>
+
+        <!-- APPLICATIONS ADMIN -->
+        <div class="adsec" id="as-apps">
+          <div class="adtit">ЗАЯВКИ В ЛИГУ</div>
+          <div class="adsub">// ПРИНЯТЬ ИЛИ ОТКЛОНИТЬ</div>
+          <div class="tabs" style="margin-bottom:20px">
+            <button class="tab on" onclick="filterApps('all',this)">ВСЕ</button>
+            <button class="tab" onclick="filterApps('pending',this)">⏳ НОВЫЕ</button>
+            <button class="tab" onclick="filterApps('accepted',this)">✅ ПРИНЯТЫЕ</button>
+            <button class="tab" onclick="filterApps('rejected',this)">❌ ОТКЛОНЁННЫЕ</button>
+          </div>
+          <div class="alist" id="applist"></div>
+        </div>
+
+        <!-- USERS -->
+        <div class="adsec" id="as-usr">
+          <div class="adtit">ПОДПИСЧИКИ</div>
+          <div class="adsub">// СПИСОК ЗАРЕГИСТРИРОВАННЫХ</div>
+          <div class="alist" id="ulist"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const isFile = location.protocol==='file:';
+const API    = isFile ? 'http://localhost:8080' : '';
+let   tok    = sessionStorage.getItem('pl_tok') || '';
+let   allApps = [];
+let   currentAppFilter = 'all';
+
+// CURSOR
+const C1=document.getElementById('CUR'),C2=document.getElementById('CUR2');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){rx+=(mx-rx)*.13;ry+=(my-ry)*.13;C1.style.left=mx+'px';C1.style.top=my+'px';C2.style.left=rx+'px';C2.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea,select')){C2.style.width='42px';C2.style.height='42px';C2.style.opacity='.25';}else{C2.style.width='28px';C2.style.height='28px';C2.style.opacity='.45';}});
+
+// MENU
+function toggleMenu(){
+  const open=document.getElementById('hbtn').classList.toggle('o');
+  document.getElementById('sb').classList.toggle('o',open);
+  document.getElementById('ov').classList.toggle('on',open);
+}
+function closeMenu(){
+  document.getElementById('hbtn').classList.remove('o');
+  document.getElementById('sb').classList.remove('o');
+  document.getElementById('ov').classList.remove('on');
+}
+
+// NAVIGATION
+let curSec='home';
+function go(id,el){
+  if(id===curSec){closeMenu();return;}
+  curSec=id;
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  if(el)el.classList.add('on'); else{const m=document.querySelector(`.ni[data-s="${id}"]`);if(m)m.classList.add('on');}
+  document.querySelectorAll('.sec').forEach(s=>{s.classList.remove('on');s.style.animation='none';});
+  const next=document.getElementById(id);
+  next.style.animation='none';void next.offsetWidth;next.style.animation='';
+  next.classList.add('on');
+  window.scrollTo(0,0);closeMenu();
+  if(id==='home'){initCanvas();runCounters();}
+  if(id==='news')loadNews();
+  if(id==='results')loadResults();
+  if(id==='players')loadPlayers();
+  if(id==='game')initPong();
+}
+
+// CANVAS
+let canvasDone=false;
+function initCanvas(){
+  if(canvasDone)return;canvasDone=true;
+  const cv=document.getElementById('hcanvas'),sec=document.getElementById('home');
+  cv.width=sec.offsetWidth||window.innerWidth;cv.height=sec.offsetHeight||window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const pts=Array.from({length:70},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45,r:Math.random()*1.3+.4}));
+  function draw(){ctx.clearRect(0,0,cv.width,cv.height);for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,0,68,.45)';ctx.fill();}
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<115){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,212,255,${(1-d/115)*.14})`;ctx.lineWidth=.5;ctx.stroke();}}requestAnimationFrame(draw);}
+  draw();
+}
+
+// COUNTERS
+let cntDone=false;
+function runCounters(){
+  if(cntDone)return;cntDone=true;
+  document.querySelectorAll('[data-n]').forEach(el=>{const t=+el.dataset.n,dur=1700,s=performance.now();const f=now=>{const p=Math.min((now-s)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*t).toLocaleString('ru-RU');if(p<1)requestAnimationFrame(f);};requestAnimationFrame(f);});
+}
+
+// NEWS
+function ytId(url){const m=url.match(/(?:v=|youtu\.be\/|embed\/)([^&?/]+)/);return m?m[1]:null;}
+
+async function loadNews(){
+  const g=document.getElementById('ngrid');
+  try{
+    const r=await fetch(API+'/api/news');
+    const data=await r.json();
+    if(!Array.isArray(data)||!data.length){g.innerHTML='<div class="nempty">Новостей пока нет</div>';return;}
+    g.innerHTML=data.map(n=>{
+      const vid=n.video?ytId(n.video):null;
+      return `<div class="nc">
+        <div class="nctop"></div>
+        <div class="ncb">
+          <div class="nccat">${esc(n.category||'НОВОСТЬ')}</div>
+          <div class="nct">${esc(n.title)}</div>
+          ${n.img?`<img class="nc-img" src="${API}${esc(n.img)}" alt="фото" loading="lazy">`:''}
+          ${vid?`<div class="nc-video"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe></div>`:''}
+          <div class="nctxt">${esc(n.body)}</div>
+          <div class="ncf"><span>${esc(n.date)}</span><span class="nca">${esc(n.author)}</span></div>
+        </div>
+      </div>`;}).join('');
+  }catch(e){g.innerHTML='<div class="nempty">⚠️ Сервер не запущен<br><span style="font-size:.6rem;color:var(--mt)">java -Dfile.encoding=UTF-8 Server</span></div>';}
+}
+
+// RESULTS
+function stab(id,btn){
+  // Scope to parent container to avoid breaking admin tabs
+  const container=btn.closest('.si')||btn.closest('.sec')||document;
+  container.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  container.querySelectorAll('.pane').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(id).classList.add('on');
+}
+async function loadResults(){
+  try{const r=await fetch(API+'/api/results');const d=await r.json();renderTable(d.table||[]);renderMatches(d.matches||[]);}
+  catch(e){document.getElementById('stb').innerHTML='<tr><td colspan="8" style="color:var(--mt);font-family:var(--fm);font-size:.62rem;padding:18px">Сервер не запущен</td></tr>';}
+}
+function renderTable(t){document.getElementById('stb').innerHTML=t.map((r,i)=>`<tr class="${i===0?'top1':''}"><td class="rk">${i+1}</td><td class="rn">${esc(r.name)}</td><td>${r.played||0}</td><td>${r.won||0}</td><td>${r.draw||0}</td><td>${r.lost||0}</td><td>${(r.gf||0)+':'+(r.ga||0)}</td><td class="rp">${r.pts||0}</td></tr>`).join('');}
+function renderMatches(ms){const el=document.getElementById('mlist');if(!ms.length){el.innerHTML='<div style="font-family:var(--fm);font-size:.68rem;color:var(--mt);padding:16px 0">Матчей нет</div>';return;}el.innerHTML=ms.map(m=>`<div class="mc"><div class="mcd">${esc(m.date)}</div><div class="mct"><div class="mtn">${esc(m.team1)}</div><div class="mts">${m.score1}:${m.score2}</div><div class="mtn r">${esc(m.team2)}</div></div></div>`).join('');}
+
+// PLAYERS
+const DEF=[
+  {id:'panda',name:'PaNdA',role:'Владелец PL',club:'Botafogo',obr:122,form:'3-4-1-2',coins:'85.59B',ico:'⚫',bg:'linear-gradient(135deg,#1a1a1a,#2a1a3a)',stars:[['Forlán','ЛВ',122],['Makaay','НАП',121],['Hazard','ЛВ',122],['Zico','ЦАП',122],['Ferdinand','ЦЗ',122]],img:'players/squad1.png'},
+  {id:'psycho',name:'Psycho',role:'Владелец PL2',club:'Real Madrid',obr:122,form:'3-4-1-2',coins:'96.13B',ico:'👑',bg:'linear-gradient(135deg,#1a1a2e,#2a2a1a)',stars:[['Gullit','НАП',122],['Dembélé','НАП',122],['Çalhanoğlu','ЦОП',122],['Ferdinand','ЦЗ',122],['Safonov','ВРТ',122]],img:'players/squad2.png'},
+  {id:'zenith',name:'Zenith',role:'Участник PL',club:'Sunderland',obr:122,form:'4-3-3 Атака',coins:'75.38B',ico:'🔴',bg:'linear-gradient(135deg,#2a0a0a,#1a1a2e)',stars:[['Cruyff','ЦАП',122],['Bale','ПВ',122],['Pirlo','ЦП',121],['Figo','ЦАП',121],['Puyol','ЦЗ',122]],img:'players/squad3.png'},
+  {id:'kaiser',name:'Kaiser',role:'Участник PL',club:'Real Madrid',obr:122,form:'4-3-3 Уд.',coins:'77.04B',ico:'⚪',bg:'linear-gradient(135deg,#1a1a2e,#0a1a2e)',stars:[['Ribéry','ЛВ',122],['Pelé','НАП',122],['Szoboszlai','ЦП',122],['Nuno Mendes','ЛЗ',122],['Courtois','ВРТ',121]],img:'players/squad4.png'},
+  {id:'titan',name:'Titan',role:'Участник PL',club:'Real Madrid',obr:122,form:'4-2-2-2',coins:'129.28B',ico:'💠',bg:'linear-gradient(135deg,#0a1030,#1a0a30)',stars:[['Mbappé','НАП',122],['Maradona','ЦАП',122],['Zico','ЦАП',122],['Roberto Carlos','ЛЗ',120],['Donnarumma','ВРТ',122]],img:'players/squad5.png'},
+];
+async function loadPlayers(){
+  const g=document.getElementById('pgrid');let players=DEF;
+  try{const r=await fetch(API+'/api/players',{signal:AbortSignal.timeout(3000)});const d=await r.json();if(Array.isArray(d)&&d.length)players=d;}catch(e){}
+  g.innerHTML=players.map(p=>`
+    <div class="pc">
+      <div class="pch">
+        ${p.img?`<img class="pc-photo" src="${API}${p.img.startsWith('/')?p.img:'/'+p.img}" alt="${esc(p.name)}" onerror="this.style.display='none'">`:''}
+        <div class="pcbg" style="background:${p.bg||'#111'}"></div>
+        <div class="pobr">ОБЩ ${p.obr}</div>
+        <div class="pico">${p.ico||'⚽'}</div>
+      </div>
+      <div class="pcb">
+        <div class="pname">${esc(p.name)}</div>
+        <div class="prole">${esc(p.role)}</div>
+        <div>
+          <div class="prow"><span class="pk">Клуб</span><span class="pv">${esc(p.club)}</span></div>
+          <div class="prow"><span class="pk">Схема</span><span class="pv">${esc(p.form)}</span></div>
+          <div class="prow"><span class="pk">Монеты</span><span class="pv">${esc(p.coins)}</span></div>
+        </div>
+        <div class="pstars">${(p.stars||[]).map(s=>`<div class="pstar"><span class="psn">${esc(s[0]||'')}</span><span style="color:var(--mt)">${esc(s[1]||'')}</span><span class="psr">${s[2]||''}</span></div>`).join('')}</div>
+        ${p.img?`<button class="pibtn" data-img="${esc(p.img)}" data-cap="${esc(p.name)} — ${esc(p.club)}" onclick="openSqBtn(this)">📷 СОСТАВ</button>`:''}
+      </div>
+    </div>`).join('');
+}
+function openSqBtn(btn){
+  openSq(btn.dataset.img, btn.dataset.cap);
+}
+function openSq(src,cap){
+  const base = isFile ? API : '';
+  document.getElementById('sqimg').src = base + (src.startsWith('/') ? src : '/'+src);
+  document.getElementById('sqcap').textContent = cap||'';
+  document.getElementById('sqm').classList.add('on');
+}
+function closeSq(){document.getElementById('sqm').classList.remove('on');}
+
+// PING PONG
+let PONG={init:false,running:false,raf:null,ball:null,ply:null,cpu:null,sc:{p:0,c:0}};
+let PC,PX;
+function initPong(){
+  PC=document.getElementById('pong');PX=PC.getContext('2d');
+  const w=Math.min(700,PC.parentElement.offsetWidth||700);PC.width=w;PC.height=Math.round(w*0.6);
+  PONG.ply={y:PC.height/2-40,h:80,w:12,x:PC.width-22};
+  PONG.cpu={y:PC.height/2-40,h:80,w:12,x:10};
+  resetBall();
+  const nc=PC.cloneNode(true);PC.parentNode.replaceChild(nc,PC);PC=nc;PX=PC.getContext('2d');
+  PC.addEventListener('mousemove',e=>{const r=PC.getBoundingClientRect();PONG.ply.y=(e.clientY-r.top)*(PC.height/r.height)-PONG.ply.h/2;});
+  PC.addEventListener('touchmove',e=>{e.preventDefault();const r=PC.getBoundingClientRect();PONG.ply.y=(e.touches[0].clientY-r.top)*(PC.height/r.height)-PONG.ply.h/2;},{passive:false});
+  PONG.running=false;if(PONG.raf){cancelAnimationFrame(PONG.raf);PONG.raf=null;}PONG.init=true;drawPong();
+}
+function resetBall(){const cx=PC?PC.width/2:350,cy=PC?PC.height/2:210;PONG.ball={x:cx,y:cy,vx:(Math.random()>.5?1:-1)*4.8,vy:(Math.random()-.5)*3.8,r:7};}
+function pongStart(){if(!PONG.init)initPong();if(PONG.running)return;PONG.running=true;document.getElementById('gbstart').classList.remove('on');document.getElementById('gst').textContent='В игре';gameLoop();}
+function pongReset(){PONG.running=false;if(PONG.raf){cancelAnimationFrame(PONG.raf);PONG.raf=null;}PONG.sc={p:0,c:0};document.getElementById('sply').textContent='0';document.getElementById('scpu').textContent='0';document.getElementById('gbstart').classList.add('on');document.getElementById('gst').textContent='Нажмите СТАРТ';if(PONG.init){resetBall();drawPong();}}
+function gameLoop(){if(!PONG.running)return;updatePong();drawPong();PONG.raf=requestAnimationFrame(gameLoop);}
+function updatePong(){const b=PONG.ball,p=PONG.ply,c=PONG.cpu;b.x+=b.vx;b.y+=b.vy;if(b.y-b.r<0){b.y=b.r;b.vy*=-1;}if(b.y+b.r>PC.height){b.y=PC.height-b.r;b.vy*=-1;}const cc=c.y+c.h/2,spd=3.2;if(cc<b.y-3)c.y+=spd;else if(cc>b.y+3)c.y-=spd;c.y=Math.max(0,Math.min(PC.height-c.h,c.y));p.y=Math.max(0,Math.min(PC.height-p.h,p.y));if(b.x-b.r<=c.x+c.w&&b.y>=c.y&&b.y<=c.y+c.h&&b.vx<0){b.vx=Math.abs(b.vx)*1.04;b.vy+=(b.y-(c.y+c.h/2))/9;b.vx=Math.min(b.vx,13);}if(b.x+b.r>=p.x&&b.y>=p.y&&b.y<=p.y+p.h&&b.vx>0){b.vx=-Math.abs(b.vx)*1.04;b.vy+=(b.y-(p.y+p.h/2))/9;b.vx=Math.max(b.vx,-13);}if(b.x<0){PONG.sc.p++;document.getElementById('sply').textContent=PONG.sc.p;toast('🎉 +1 Вы!');resetBall();b.vx=4.8;}if(b.x>PC.width){PONG.sc.c++;document.getElementById('scpu').textContent=PONG.sc.c;toast('CPU +1',true);resetBall();b.vx=-4.8;}}
+function drawPong(){if(!PC||!PX)return;PX.clearRect(0,0,PC.width,PC.height);PX.strokeStyle='rgba(255,255,255,.03)';PX.lineWidth=1;for(let x=0;x<PC.width;x+=40){PX.beginPath();PX.moveTo(x,0);PX.lineTo(x,PC.height);PX.stroke();}for(let y=0;y<PC.height;y+=40){PX.beginPath();PX.moveTo(0,y);PX.lineTo(PC.width,y);PX.stroke();}PX.setLineDash([7,7]);PX.strokeStyle='rgba(255,255,255,.09)';PX.beginPath();PX.moveTo(PC.width/2,0);PX.lineTo(PC.width/2,PC.height);PX.stroke();PX.setLineDash([]);PX.shadowBlur=12;PX.shadowColor='#ff0044';PX.fillStyle='#ff0044';PX.fillRect(PONG.cpu.x,PONG.cpu.y,PONG.cpu.w,PONG.cpu.h);PX.shadowColor='#00d4ff';PX.fillStyle='#00d4ff';PX.fillRect(PONG.ply.x,PONG.ply.y,PONG.ply.w,PONG.ply.h);PX.shadowColor='#fff';PX.shadowBlur=18;PX.beginPath();PX.arc(PONG.ball.x,PONG.ball.y,PONG.ball.r,0,Math.PI*2);PX.fillStyle='#fff';PX.fill();PX.shadowBlur=0;}
+
+// APPLY
+async function doApply(e){
+  e.preventDefault();
+  const b={name:document.getElementById('ap-name').value.trim(),obr:document.getElementById('ap-obr').value,club:document.getElementById('ap-club').value.trim(),form:document.getElementById('ap-form').value.trim(),league:document.getElementById('ap-league').value,contact:document.getElementById('ap-contact').value.trim(),about:document.getElementById('ap-about').value.trim()};
+  try{await fetch(API+'/api/applications',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});}catch(err){}
+  document.getElementById('app-wrap').style.display='none';
+  document.getElementById('app-success').style.display='block';
+  toast('📋 Заявка отправлена!','s');
+}
+
+// REGISTER
+async function doReg(e){
+  e.preventDefault();
+  const name=document.getElementById('rname').value.trim(),email=document.getElementById('remail').value.trim();
+  try{await fetch(API+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email})});}catch(err){}
+  document.getElementById('rfwrap').style.display='none';
+  document.getElementById('rsucc').style.display='block';
+  toast('🔔 Подписка оформлена!','s');
+  if('Notification' in window)Notification.requestPermission();
+}
+
+// SSE
+function startSSE(){
+  if(isFile)return;
+  try{
+    const es=new EventSource(API+'/api/events');
+    es.addEventListener('news',e=>{const d=JSON.parse(e.data);toast('📰 '+d.title);if(Notification.permission==='granted')new Notification('PSYCHO LEAGUE',{body:d.title});});
+    es.addEventListener('application',e=>{
+      if(tok) loadAApps(); // only if logged in
+      const btn=document.getElementById('an-apps');
+      if(btn)btn.innerHTML='📋 Заявки <span class="badge">!</span>';
+    });
+    es.onerror=()=>{es.close();setTimeout(startSSE,10000);};
+  }catch(err){}
+}
+setTimeout(startSSE,3000);
+
+// UPLOAD FILE
+async function uploadFile(file){
+  const fd=new FormData();fd.append('file',file);
+  const r=await fetch(API+'/api/upload',{method:'POST',headers:{'Authorization':tok},body:fd});
+  const d=await r.json();
+  if(d.ok)return d.url;
+  throw new Error(d.error||'upload failed');
+}
+
+async function previewUpload(input,prevId,urlId){
+  const file=input.files[0];if(!file)return;
+  // Local preview
+  const reader=new FileReader();
+  reader.onload=e=>{const img=document.getElementById(prevId);img.src=e.target.result;img.style.display='block';};
+  reader.readAsDataURL(file);
+  // Upload to server
+  try{
+    toast('⏳ Загрузка...');
+    const url=await uploadFile(file);
+    document.getElementById(urlId).value=url;
+    toast('✅ Фото загружено!','s');
+  }catch(err){toast('Ошибка загрузки: '+err.message,true);}
+}
+
+// ADMIN
+function openAdmin(){document.getElementById('adm').classList.add('on');if(tok)showPanel();else document.getElementById('alog').classList.remove('h');}
+function closeAdmin(){document.getElementById('adm').classList.remove('on');}
+async function doLogin(){
+  const u=document.getElementById('auser').value.trim(),p=document.getElementById('apass').value;
+  const err=document.getElementById('lerr');err.style.display='none';
+  try{
+    const r=await fetch(API+'/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:u,pass:p})});
+    const d=await r.json();
+    if(d.token){tok=d.token;sessionStorage.setItem('pl_tok',tok);showPanel();}
+    else{err.textContent='Неверный логин или пароль';err.style.display='block';}
+  }catch(e){err.textContent='Ошибка: сервер не запущен';err.style.display='block';}
+}
+function showPanel(){document.getElementById('alog').classList.add('h');document.getElementById('apanel').style.display='block';loadANews();loadAResults();loadAPlayers();loadAApps();loadAUsers();}
+function aLogout(){tok='';sessionStorage.removeItem('pl_tok');document.getElementById('apanel').style.display='none';document.getElementById('alog').classList.remove('h');document.getElementById('adm').classList.remove('on');}
+function aTab(id,el){
+  document.querySelectorAll('.adsec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.an:not(.ex)').forEach(a=>a.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  el.classList.add('on');
+}
+
+// ── ADMIN NEWS ──
+async function loadANews(){
+  try{
+    const r=await fetch(API+'/api/news');
+    if(!r.ok) return;
+    const d=await r.json();
+    const el=document.getElementById('nalist');
+    if(!Array.isArray(d)){el.innerHTML='<div class="aempty">Ошибка загрузки</div>';return;}
+    el.innerHTML=d.length?d.map(n=>`
+      <div class="ai">
+        <div class="aib">
+          <div class="ait">${esc(n.title)}</div>
+          <div class="aim">${esc(n.date)} · ${esc(n.author)} · ${esc(n.category)}${n.img?' · 📷':''}${n.video?' · 🎥':''}</div>
+        </div>
+        <div class="abtn-row">
+          <button class="aacc" onclick="editNews(${n.id})">✏️</button>
+          <button class="adel" onclick="delNews(${n.id})">✕</button>
+        </div>
+      </div>`).join(''):'<div class="aempty">Новостей нет</div>';
+  }catch(e){}
+}
+
+async function postNews(){
+  const editId=document.getElementById('edit-news-id').value;
+  const b={
+    title:document.getElementById('ntit').value,
+    body:document.getElementById('nbod').value,
+    category:document.getElementById('ncat').value,
+    author:document.getElementById('naut').value||'Admin',
+  };
+  const imgUrl=document.getElementById('news-photo-url').value;
+  const vid=document.getElementById('nvid').value.trim();
+  if(imgUrl)b.img=imgUrl;
+  if(vid)b.video=vid;
+  if(!b.title.trim())return toast('Введите заголовок',true);
+  try{
+    if(editId){
+      const r=await fetch(API+'/api/admin/news/'+editId,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(b)});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      toast('✅ Новость обновлена!','s'); cancelEditNews();
+    }else{
+      const r=await fetch(API+'/api/admin/news',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(b)});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      toast('✅ Новость опубликована!','s');
+    }
+    clearNewsForm(); loadANews();
+  }catch(e){toast('Ошибка: '+e.message,true);}
+}
+
+function editNews(id){
+  fetch(API+'/api/news').then(r=>r.json()).then(data=>{
+    const n=data.find(x=>x.id==id);if(!n)return;
+    document.getElementById('ntit').value=n.title||'';
+    document.getElementById('nbod').value=n.body||'';
+    document.getElementById('naut').value=n.author||'';
+    document.getElementById('nvid').value=n.video||'';
+    document.getElementById('news-photo-url').value=n.img||'';
+    if(n.img){const prev=document.getElementById('news-photo-prev');prev.src=API+n.img;prev.style.display='block';}
+    document.getElementById('edit-news-id').value=id;
+    document.getElementById('cancel-edit-news').style.display='';
+    document.querySelector('#as-news .adtit').textContent='РЕДАКТИРОВАНИЕ НОВОСТИ #'+id;
+    // Scroll admin panel to top, not window
+    const adm=document.getElementById('adm');
+    if(adm) adm.scrollTop=0;
+  });
+}
+
+function cancelEditNews(){
+  document.getElementById('edit-news-id').value='';
+  document.getElementById('cancel-edit-news').style.display='none';
+  document.querySelector('#as-news .adtit').textContent='НОВОСТИ';
+  clearNewsForm();
+}
+
+function clearNewsForm(){
+  document.getElementById('ntit').value='';
+  document.getElementById('nbod').value='';
+  document.getElementById('nvid').value='';
+  document.getElementById('news-photo-url').value='';
+  document.getElementById('news-photo-prev').style.display='none';
+  document.getElementById('news-photo-prev').src='';
+  // Reset file input
+  const fi=document.getElementById('news-photo-file');
+  if(fi) fi.value='';
+}
+
+async function delNews(id){
+  if(!confirm('Удалить новость?'))return;
+  try{await fetch(API+'/api/admin/news/'+id,{method:'DELETE',headers:{'Authorization':tok}});loadANews();}catch(e){}
+}
+
+// ── ADMIN RESULTS ──
+async function loadAResults(){
+  try{
+    const r=await fetch(API+'/api/results');const d=await r.json();
+    const el=document.getElementById('ralist');const ms=d.matches||[];
+    el.innerHTML=ms.length?ms.map(m=>`<div class="ai"><div class="aib"><div class="ait">${esc(m.team1)} ${m.score1}:${m.score2} ${esc(m.team2)}</div><div class="aim">${esc(m.date)}</div></div><button class="adel" onclick="delRes(${m.id})">✕</button></div>`).join(''):'<div class="aempty">Матчей нет</div>';
+  }catch(e){}
+}
+async function postResult(){
+  const b={team1:document.getElementById('rt1').value.trim(),team2:document.getElementById('rt2').value.trim(),score1:+document.getElementById('rs1').value,score2:+document.getElementById('rs2').value,date:document.getElementById('rdate').value||new Date().toLocaleDateString('ru-RU')};
+  if(!b.team1||!b.team2)return toast('Заполни обе команды',true);
+  try{
+    const r=await fetch(API+'/api/admin/result',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(b)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    toast('✅ Матч добавлен!','s');
+    // Clear form
+    document.getElementById('rt1').value='';
+    document.getElementById('rt2').value='';
+    document.getElementById('rs1').value='0';
+    document.getElementById('rs2').value='0';
+    loadAResults();
+  }catch(e){toast('Ошибка: '+e.message,true);}
+}
+async function delRes(id){
+  if(!confirm('Удалить матч?'))return;
+  try{await fetch(API+'/api/admin/result/'+id,{method:'DELETE',headers:{'Authorization':tok}});loadAResults();}catch(e){}
+}
+
+// ── ADMIN PLAYERS ──
+async function loadAPlayers(){
+  try{
+    const r=await fetch(API+'/api/players');
+    if(!r.ok) return;
+    const d=await r.json();
+    const el=document.getElementById('palist');
+    if(!Array.isArray(d)){el.innerHTML='<div class="aempty">Ошибка загрузки</div>';return;}
+    el.innerHTML=d.length?d.map(p=>`
+      <div class="ai">
+        <div class="aib">
+          <div class="ait">${esc(p.ico||'⚽')} ${esc(p.name)}</div>
+          <div class="aim">${esc(p.club)} · ${esc(p.form)} · ОБЩ ${p.obr}${p.img?' · 📷':''}</div>
+        </div>
+        <button class="adel" data-pid="${esc(String(p.id))}" onclick="delPlayerById(this)">✕</button>
+      </div>`).join(''):'<div class="aempty">Игроков нет (показываются дефолтные)</div>';
+  }catch(e){}
+}
+// Safe delete using data attribute — avoids JS injection via player id
+function delPlayerById(btn){
+  const id=btn.dataset.pid;
+  if(!id||!confirm('Удалить игрока?'))return;
+  fetch(API+'/api/admin/player/'+encodeURIComponent(id),{method:'DELETE',headers:{'Authorization':tok}})
+    .then(()=>loadAPlayers()).catch(()=>{});
+}
+async function postPlayer(){
+  const rawStars=document.getElementById('pst').value;
+  const stars=rawStars.split(',').filter(s=>s.trim()).map(s=>{const pts=s.trim().split(/\s+/);const obr=parseInt(pts[pts.length-1]);const pos=isNaN(obr)?'':pts[pts.length-2];const nm=pts.slice(0,isNaN(obr)?pts.length:pts.length-2).join(' ');return[nm,pos,isNaN(obr)?0:obr];});
+  const imgUrl=document.getElementById('player-photo-url').value;
+  const b={id:'p'+Date.now(),name:document.getElementById('pnm').value,role:document.getElementById('prl').value,club:document.getElementById('pcl').value,obr:+document.getElementById('pob').value,form:document.getElementById('pfo').value,coins:document.getElementById('pco').value,ico:document.getElementById('pic').value||'⚽',stars,bg:'linear-gradient(135deg,#111,#1a1a2e)'};
+  if(imgUrl)b.img=imgUrl;
+  if(!b.name.trim())return toast('Введи ник',true);
+  try{
+    await fetch(API+'/api/admin/player',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(b)});
+    toast('✅ Игрок добавлен!','s');
+    // Clear form
+    ['pnm','prl','pcl','pfo','pco','pic','pst'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('pob').value='122';
+    document.getElementById('player-photo-url').value='';
+    document.getElementById('player-photo-prev').style.display='none';
+    document.getElementById('player-photo-prev').src='';
+    const pf=document.getElementById('player-photo-file');if(pf)pf.value='';
+    loadAPlayers();
+  }catch(e){toast('Ошибка',true);}
+}
+async function delPlayer(id){
+  if(!confirm('Удалить игрока?'))return;
+  try{await fetch(API+'/api/admin/player/'+encodeURIComponent(id),{method:'DELETE',headers:{'Authorization':tok}});loadAPlayers();}catch(e){}
+}
+
+// ── ADMIN APPLICATIONS ──
+async function loadAApps(){
+  try{
+    const r=await fetch(API+'/api/admin/applications',{headers:{'Authorization':tok}});
+    if(!r.ok){ renderApps(); return; } // auth failed or other error
+    const d=await r.json();
+    if(Array.isArray(d)) allApps=d; // only assign if valid array
+    renderApps();
+    // Update badge
+    const pending=allApps.filter(a=>a.status==='pending').length;
+    const btn=document.getElementById('an-apps');
+    if(btn)btn.innerHTML='📋 Заявки'+(pending>0?` <span class="badge">${pending}</span>`:'');
+  }catch(e){}
+}
+
+function filterApps(f,btn){
+  currentAppFilter=f;
+  document.querySelectorAll('#as-apps .tab').forEach(t=>t.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  renderApps();
+}
+
+function renderApps(){
+  const el=document.getElementById('applist');
+  let apps=allApps;
+  if(currentAppFilter!=='all')apps=allApps.filter(a=>a.status===currentAppFilter);
+  if(!apps.length){el.innerHTML='<div class="aempty">Заявок нет</div>';return;}
+  el.innerHTML=apps.map(a=>`
+    <div class="ai ${a.status||'pending'}">
+      <div class="aib">
+        <div class="ait">${esc(a.name)} · ОБЩ ${a.obr} · ${esc(a.league||'')}</div>
+        <div class="aim">
+          Клуб: ${esc(a.club||'—')} · Схема: ${esc(a.form||'—')} · Контакт: ${esc(a.contact||'—')}<br>
+          ${a.about?'О себе: '+esc(a.about)+' · ':''}Дата: ${esc(a.date)} · Статус: <strong style="color:${a.status==='accepted'?'var(--grn)':a.status==='rejected'?'var(--mt)':'var(--gld)'}">${a.status==='accepted'?'✅ Принят':a.status==='rejected'?'❌ Отклонён':'⏳ На рассмотрении'}</strong>
+        </div>
+      </div>
+      <div class="abtn-row">
+        ${a.status==='pending'?`<button class="aacc" onclick="appAction(${a.id},'accept')">✅</button><button class="arej" onclick="appAction(${a.id},'reject')">❌</button>`:''}
+        <button class="adel" onclick="delApp(${a.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function appAction(id,action){
+  try{
+    await fetch(API+'/api/admin/applications/'+id+'/'+action,{method:'PUT',headers:{'Authorization':tok}});
+    toast(action==='accept'?'✅ Заявка принята!':'❌ Заявка отклонена',action==='accept'?'s':false);
+    loadAApps();
+  }catch(e){toast('Ошибка',true);}
+}
+async function delApp(id){
+  if(!confirm('Удалить заявку?'))return;
+  try{await fetch(API+'/api/admin/applications/'+id,{method:'DELETE',headers:{'Authorization':tok}});loadAApps();}catch(e){}
+}
+
+// ── ADMIN USERS ──
+async function loadAUsers(){
+  try{
+    const r=await fetch(API+'/api/admin/users',{headers:{'Authorization':tok}});
+    if(!r.ok) return;
+    const d=await r.json();
+    const el=document.getElementById('ulist');
+    if(!Array.isArray(d)){el.innerHTML='<div class="aempty">Ошибка загрузки</div>';return;}
+    el.innerHTML=d.length?d.map(u=>`<div class="ai"><div class="aib"><div class="ait">${esc(u.name)}</div><div class="aim">${esc(u.email||'—')} · ${esc(u.date)}</div></div></div>`).join(''):'<div class="aempty">Нет подписчиков</div>';
+  }catch(e){}
+}
+
+// EDIT MODAL (generic)
+let editCb=null;
+function closeEdit(){document.getElementById('edit-modal').classList.remove('on');}
+function saveEdit(){if(editCb)editCb();}
+
+// TOAST
+function toast(msg,type=false){
+  const w=document.getElementById('tw');const t=document.createElement('div');
+  t.className='toast'+(type===true||type==='e'?' e':type==='s'?' s':'');
+  t.textContent=msg;w.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(18px)';t.style.transition='.28s';setTimeout(()=>t.remove(),320);},3500);
+}
+
+// UTILS
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// INIT
+window.addEventListener('DOMContentLoaded',()=>{
+  initCanvas();runCounters();
+  const rd=document.getElementById('rdate');if(rd)rd.valueAsDate=new Date();
+});
+</script>
+</body>
+</html>
