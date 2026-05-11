@@ -3,6 +3,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.security.MessageDigest;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -12,515 +13,134 @@ import java.util.stream.Collectors;
 import java.util.Base64;
 
 /**
- * PSYCHO LEAGUE — Server.java v5.0
- * Compile : javac Server.java
- * Run     : java -Dfile.encoding=UTF-8 Server
+ * PSYCHO LEAGUE — Server.java v7.0
+ * Roles: owner(luveniaw/!Humoaxi123) > admin(Panda/Humoaxi123) > user
+ * All Phases: Auth + Profiles + Messages + Posts + Cart + Tournaments
+ * Compile: javac Server.java
+ * Run:     java -Dfile.encoding=UTF-8 Server
  */
 public class Server {
-
     static final int PORT;
-    static {
-        int p = 8080;
-        try { p = Integer.parseInt(System.getenv().getOrDefault("PORT","8080")); } catch(Exception e) {}
-        PORT = p;
-    }
-
-    static final String ADMIN_USER = "Panda";
-    static final String ADMIN_PASS = "Humoaxi123";
-    static final String DATA_DIR   = "data";
-    static final long   MAX_UPLOAD = 10 * 1024 * 1024; // 10MB
-
-    // In-memory stores
-    static final List<Map<String,Object>> NEWS         = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> MATCHES      = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> TABLE        = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> PLAYERS      = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> USERS        = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> APPLICATIONS = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> SHOP_ITEMS   = new CopyOnWriteArrayList<>();
-    static final List<Map<String,Object>> SCORES       = new CopyOnWriteArrayList<>();
-    static final Map<String,Object>       SITE_TEXTS   = new ConcurrentHashMap<>();
-    static final List<HttpExchange>       SSE           = new CopyOnWriteArrayList<>();
-    static final Map<String,Long>         TOKENS        = new ConcurrentHashMap<>();
-
-    static final AtomicInteger NID = new AtomicInteger(1);
-    static final AtomicInteger MID = new AtomicInteger(1);
-    static final AtomicInteger PID = new AtomicInteger(1);
-    static final AtomicInteger UID = new AtomicInteger(1);
-    static final AtomicInteger AID = new AtomicInteger(1);
-    static final AtomicInteger SID = new AtomicInteger(1);
-    static final AtomicInteger SCID= new AtomicInteger(1);
-
+    static { int p=8080; try{p=Integer.parseInt(System.getenv().getOrDefault("PORT","8080"));}catch(Exception e){} PORT=p; }
+    static final String OWNER_USER="luveniaw",OWNER_PASS="!Humoaxi123",ADMIN_USER="Panda",ADMIN_PASS="Humoaxi123",DATA_DIR="data";
+    static final long MAX_UPLOAD=10*1024*1024;
+    static final List<Map<String,Object>> NEWS=new CopyOnWriteArrayList<>(),MATCHES=new CopyOnWriteArrayList<>(),TABLE=new CopyOnWriteArrayList<>(),PLAYERS=new CopyOnWriteArrayList<>(),USERS=new CopyOnWriteArrayList<>(),APPLICATIONS=new CopyOnWriteArrayList<>(),SHOP_ITEMS=new CopyOnWriteArrayList<>(),SCORES=new CopyOnWriteArrayList<>(),ADMINS=new CopyOnWriteArrayList<>(),POSTS=new CopyOnWriteArrayList<>(),MESSAGES=new CopyOnWriteArrayList<>(),TOURNAMENTS=new CopyOnWriteArrayList<>(),MATCH_RESULTS=new CopyOnWriteArrayList<>();
+    static final Map<String,Object> SITE_TEXTS=new ConcurrentHashMap<>();
+    static final List<HttpExchange> SSE=new CopyOnWriteArrayList<>();
+    static final Map<String,Map<String,Object>> TOKENS=new ConcurrentHashMap<>();
+    static final AtomicInteger NID=new AtomicInteger(1),MID=new AtomicInteger(1),PID=new AtomicInteger(1),UID=new AtomicInteger(1),AID=new AtomicInteger(1),SID=new AtomicInteger(1),SCID=new AtomicInteger(1),POSTID=new AtomicInteger(1),MSGID=new AtomicInteger(1),TOURID=new AtomicInteger(1),MRID=new AtomicInteger(1);
     static PrintStream P;
-    static {
-        try { P = new PrintStream(System.out, true, "UTF-8"); }
-        catch (Exception e) { P = System.out; }
-        System.setOut(P); System.setErr(P);
-    }
+    static{try{P=new PrintStream(System.out,true,"UTF-8");}catch(Exception e){P=System.out;}System.setOut(P);System.setErr(P);}
 
     public static void main(String[] args) throws Exception {
-        P.println("╔══════════════════════════════════════╗");
-        P.println("║  PSYCHO LEAGUE SERVER  v5.0          ║");
-        P.println("║  Port: " + PORT + "                         ║");
-        P.println("╚══════════════════════════════════════╝");
+        P.println("╔══════════════════════════════════════════╗");
+        P.println("║   PSYCHO LEAGUE  v7.0  ALL PHASES        ║");
+        P.println("║   Owner: luveniaw | Admin: Panda         ║");
+        P.println("╚══════════════════════════════════════════╝");
+        new File(DATA_DIR).mkdirs(); load(); seedIfEmpty();
+        HttpServer srv=HttpServer.create(new InetSocketAddress(PORT),256);
 
-        new File(DATA_DIR).mkdirs();
-        load();
-        seedIfEmpty();
+        srv.createContext("/",ex->{String p=ex.getRequestURI().getPath();if(p.startsWith("/api")){respond(ex,404,"text/plain","Not found");return;}if(p.equals("/")||p.equals("/index.html"))p="/index.html";if(p.contains("..")){respond(ex,403,"text/plain","Forbidden");return;}File f=new File("."+p);if(f.exists()&&f.isFile())respond(ex,200,mime(p),Files.readAllBytes(f.toPath()));else{File idx=new File("./index.html");if(idx.exists())respond(ex,200,"text/html; charset=utf-8",Files.readAllBytes(idx.toPath()));else respond(ex,404,"text/plain","404");}});
 
-        HttpServer srv = HttpServer.create(new InetSocketAddress(PORT), 256);
+        srv.createContext("/api/auth/register",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}try{Map<String,Object>req=parseObj(body(ex));String login=s(req,"login").trim(),nick=s(req,"nick").trim(),pass=s(req,"pass");if(login.isEmpty()||nick.isEmpty()||pass.length()<4){respondJson(ex,400,"{\"error\":\"Заполни все поля\"}");return;}boolean taken=USERS.stream().anyMatch(u->s(u,"login").equalsIgnoreCase(login))||OWNER_USER.equalsIgnoreCase(login)||ADMIN_USER.equalsIgnoreCase(login)||ADMINS.stream().anyMatch(a->s(a,"login").equalsIgnoreCase(login));if(taken){respondJson(ex,409,"{\"error\":\"Логин занят\"}");return;}Map<String,Object>u=new LinkedHashMap<>();u.put("id",UID.getAndIncrement());u.put("login",login);u.put("nick",nick);u.put("passHash",sha256(pass));u.put("points",0);u.put("role","user");u.put("avatar","⚽");u.put("status","");u.put("date",today());u.put("purchases",new ArrayList<>());u.put("cart",new ArrayList<>());USERS.add(u);save();respondJson(ex,200,"{\"ok\":true}");P.println("[REG] "+nick+"("+login+")");}catch(Exception e){respondJson(ex,400,"{\"error\":\"Ошибка регистрации\"}");}});
 
-        // Static files
-        srv.createContext("/", ex -> {
-            String p = ex.getRequestURI().getPath();
-            if (p.startsWith("/api")) { respond(ex,404,"text/plain","Not found"); return; }
-            if (p.equals("/") || p.equals("/index.html")) p = "/index.html";
-            if (p.contains("..")) { respond(ex,403,"text/plain","Forbidden"); return; }
-            File f = new File("." + p);
-            if (f.exists() && f.isFile()) {
-                respond(ex, 200, mime(p), Files.readAllBytes(f.toPath()));
-            } else {
-                File idx = new File("./index.html");
-                if (idx.exists()) respond(ex, 200, "text/html; charset=utf-8", Files.readAllBytes(idx.toPath()));
-                else respond(ex, 404, "text/plain", "404");
-            }
-        });
+        srv.createContext("/api/auth/login",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String b=body(ex),login=strVal(b,"login"),pass=strVal(b,"pass");if(OWNER_USER.equals(login)&&OWNER_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","owner","user",login,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"ok\":true,\"token\":\""+tok+"\",\"role\":\"owner\",\"nick\":\""+jesc(login)+"\"}");return;}if(ADMIN_USER.equals(login)&&ADMIN_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",login,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"ok\":true,\"token\":\""+tok+"\",\"role\":\"admin\",\"nick\":\""+jesc(login)+"\"}");return;}for(Map<String,Object>adm:ADMINS){if(s(adm,"login").equals(login)&&s(adm,"pass").equals(sha256(pass))){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",login,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"ok\":true,\"token\":\""+tok+"\",\"role\":\"admin\",\"nick\":\""+jesc(s(adm,"nick"))+"\"}");return;}}for(Map<String,Object>u:USERS){if(s(u,"login").equals(login)&&s(u,"passHash").equals(sha256(pass))){String tok=genTok();TOKENS.put(tok,Map.of("role","user","user",login,"uid",String.valueOf(u.get("id")),"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"ok\":true,\"token\":\""+tok+"\",\"role\":\"user\",\"nick\":\""+jesc(s(u,"nick"))+"\",\"uid\":"+u.get("id")+"}");return;}}respondJson(ex,401,"{\"error\":\"Неверный логин или пароль\"}");});
 
-        // Public APIs
-        srv.createContext("/api/news",    ex -> { cors(ex); respondJson(ex,200,arrJson(NEWS)); });
-        srv.createContext("/api/results", ex -> { cors(ex); respondJson(ex,200,"{\"table\":"+arrJson(TABLE)+",\"matches\":"+arrJson(MATCHES)+"}"); });
-        srv.createContext("/api/players", ex -> { cors(ex); respondJson(ex,200,arrJson(PLAYERS)); });
-        srv.createContext("/api/texts",   ex -> { cors(ex); respondJson(ex,200,mapJson(SITE_TEXTS)); });
-        srv.createContext("/api/shop",    ex -> { cors(ex); respondJson(ex,200,arrJson(SHOP_ITEMS)); });
+        srv.createContext("/api/auth/me",ex->{cors(ex);Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"not logged in\"}");return;}String role=s(t,"role"),user=s(t,"user");if("owner".equals(role)){respondJson(ex,200,"{\"role\":\"owner\",\"nick\":\""+jesc(user)+"\",\"points\":999999,\"avatar\":\"👑\",\"status\":\"Владелец\",\"login\":\""+jesc(user)+"\",\"date\":\"\",\"purchases\":[]}");return;}if("admin".equals(role)){respondJson(ex,200,"{\"role\":\"admin\",\"nick\":\""+jesc(user)+"\",\"points\":0,\"avatar\":\"🔧\",\"status\":\"Администратор\",\"login\":\""+jesc(user)+"\",\"date\":\"\",\"purchases\":[]}");return;}for(Map<String,Object>u:USERS){if(s(u,"login").equals(user)){Map<String,Object>safe=new LinkedHashMap<>(u);safe.remove("passHash");respondJson(ex,200,objJson(safe));return;}}respondJson(ex,404,"{\"error\":\"not found\"}");});
 
-        // Scores
-        srv.createContext("/api/scores", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if ("GET".equals(ex.getRequestMethod())) {
-                respondJson(ex,200,arrJson(SCORES));
-            } else if ("POST".equals(ex.getRequestMethod())) {
-                try {
-                    Map<String,Object> sc = parseObj(body(ex));
-                    // Update or create score entry
-                    String name = s(sc,"name");
-                    boolean found = false;
-                    for (int i=0;i<SCORES.size();i++) {
-                        if (s(SCORES.get(i),"name").equals(name)) {
-                            Map<String,Object> upd = new LinkedHashMap<>(SCORES.get(i));
-                            int oldPts = toInt(upd.get("points"));
-                            int newPts = oldPts + toInt(sc.get("points"));
-                            upd.put("points", newPts);
-                            upd.put("lastSeen", LocalDate.now().toString());
-                            SCORES.set(i, upd);
-                            found = true; break;
-                        }
-                    }
-                    if (!found) {
-                        sc.put("id", SCID.getAndIncrement());
-                        sc.put("lastSeen", LocalDate.now().toString());
-                        SCORES.add(sc);
-                    }
-                    // Sort by points desc
-                    SCORES.sort((a,b) -> Integer.compare(toInt(b.get("points")),toInt(a.get("points"))));
-                    save();
-                    respondJson(ex,200,"{\"ok\":true}");
-                } catch(Exception e){ respondJson(ex,400,"{\"error\":\"bad\"}"); }
-            }
-        });
+        srv.createContext("/api/auth/profile",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String login=s(t,"user");Map<String,Object>upd=parseObj(body(ex));for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(login)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));if(upd.containsKey("nick")&&!s(upd,"nick").isEmpty())u.put("nick",s(upd,"nick"));if(upd.containsKey("avatar"))u.put("avatar",s(upd,"avatar"));if(upd.containsKey("status"))u.put("status",s(upd,"status"));if(upd.containsKey("newPass")&&!s(upd,"newPass").isEmpty()){if(!s(u,"passHash").equals(sha256(s(upd,"oldPass")))){respondJson(ex,403,"{\"error\":\"Неверный текущий пароль\"}");return;}u.put("passHash",sha256(s(upd,"newPass")));}USERS.set(i,u);save();respondJson(ex,200,"{\"ok\":true}");return;}}respondJson(ex,404,"{\"error\":\"not found\"}");});
 
-        // Applications
-        srv.createContext("/api/applications", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if ("POST".equals(ex.getRequestMethod())) {
-                try {
-                    Map<String,Object> a = parseObj(body(ex));
-                    a.put("id", AID.getAndIncrement());
-                    a.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                    a.put("status","pending");
-                    APPLICATIONS.add(a);
-                    save();
-                    respondJson(ex,200,"{\"ok\":true}");
-                    broadcast("application","{\"name\":\""+jesc(s(a,"name"))+"\"}");
-                } catch(Exception e){ respondJson(ex,400,"{\"error\":\"bad\"}"); }
-            }
-        });
+        srv.createContext("/api/news",ex->{cors(ex);respondJson(ex,200,arrJson(NEWS));});
+        srv.createContext("/api/results",ex->{cors(ex);respondJson(ex,200,"{\"table\":"+arrJson(TABLE)+",\"matches\":"+arrJson(MATCHES)+"}");});
+        srv.createContext("/api/players",ex->{cors(ex);respondJson(ex,200,arrJson(PLAYERS));});
+        srv.createContext("/api/texts",ex->{cors(ex);respondJson(ex,200,objJson(SITE_TEXTS));});
+        srv.createContext("/api/shop",ex->{cors(ex);respondJson(ex,200,arrJson(SHOP_ITEMS));});
+        srv.createContext("/api/users/list",ex->{cors(ex);List<Map<String,Object>>safe=USERS.stream().map(u->{Map<String,Object>s2=new LinkedHashMap<>();s2.put("login",u.get("login"));s2.put("nick",u.get("nick"));s2.put("avatar",u.get("avatar"));return s2;}).collect(Collectors.toList());respondJson(ex,200,arrJson(safe));});
 
-        // Register
-        srv.createContext("/api/register", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            try {
-                Map<String,Object> u = parseObj(body(ex));
-                u.put("id", UID.getAndIncrement());
-                u.put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                USERS.add(u); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            } catch(Exception e){ respondJson(ex,400,"{\"error\":\"bad\"}"); }
-        });
+        srv.createContext("/api/scores",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if("GET".equals(ex.getRequestMethod())){respondJson(ex,200,arrJson(SCORES));return;}if("POST".equals(ex.getRequestMethod())){try{Map<String,Object>sc=parseObj(body(ex));String name=s(sc,"name");int pts=toInt(sc.get("points"));boolean found=false;for(int i=0;i<SCORES.size();i++){if(s(SCORES.get(i),"name").equals(name)){Map<String,Object>u=new LinkedHashMap<>(SCORES.get(i));u.put("points",toInt(u.get("points"))+pts);u.put("lastSeen",today());SCORES.set(i,u);found=true;break;}}if(!found){sc.put("id",SCID.getAndIncrement());sc.put("lastSeen",today());SCORES.add(sc);}SCORES.sort((a,b2)->Integer.compare(toInt(b2.get("points")),toInt(a.get("points"))));Map<String,Object>t=getTok(ex);if(t!=null&&"user".equals(s(t,"role"))){String ul=s(t,"user");for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(ul)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));u.put("points",toInt(u.get("points"))+pts);USERS.set(i,u);break;}}}save();respondJson(ex,200,"{\"ok\":true}");}catch(Exception e){respondJson(ex,400,"{\"error\":\"bad\"}");}}});
 
-        // SSE
-        srv.createContext("/api/events", ex -> {
-            ex.getResponseHeaders().set("Content-Type","text/event-stream; charset=utf-8");
-            ex.getResponseHeaders().set("Cache-Control","no-cache");
-            ex.getResponseHeaders().set("Access-Control-Allow-Origin","*");
-            ex.sendResponseHeaders(200,0);
-            SSE.add(ex);
-            try { while(!Thread.currentThread().isInterrupted()){ Thread.sleep(20000); ex.getResponseBody().write(": ping\n\n".getBytes(StandardCharsets.UTF_8)); ex.getResponseBody().flush(); } }
-            catch(Exception e){} finally { SSE.remove(ex); }
-        });
+        srv.createContext("/api/applications",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if("POST".equals(ex.getRequestMethod())){try{Map<String,Object>a=parseObj(body(ex));a.put("id",AID.getAndIncrement());a.put("date",today());a.put("status","pending");APPLICATIONS.add(a);save();broadcast("application","{\"name\":\""+jesc(s(a,"name"))+"\"}");respondJson(ex,200,"{\"ok\":true}");}catch(Exception e){respondJson(ex,400,"{\"error\":\"bad\"}");}}});
 
-        // Upload — stores as base64 in data (Railway compatible, no ephemeral fs)
-        srv.createContext("/api/upload", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            try {
-                byte[] raw = ex.getRequestBody().readAllBytes();
-                if (raw.length > MAX_UPLOAD) { respondJson(ex,413,"{\"error\":\"too large\"}"); return; }
-                String ct = ex.getRequestHeaders().getFirst("Content-Type");
-                if (ct == null || !ct.contains("multipart/form-data")) {
-                    respondJson(ex,400,"{\"error\":\"need multipart\"}"); return;
-                }
-                String boundary = ct.split("boundary=")[1].trim();
-                byte[] hSep = "\r\n\r\n".getBytes(StandardCharsets.UTF_8);
-                int hEnd = indexOf(raw, hSep);
-                String headers = hEnd>0 ? new String(raw,0,hEnd,StandardCharsets.UTF_8) : new String(raw,0,Math.min(1024,raw.length),StandardCharsets.UTF_8);
-                // Get mime type
-                String mimeType = "image/jpeg";
-                if (headers.contains("image/png")) mimeType="image/png";
-                else if (headers.contains("image/gif")) mimeType="image/gif";
-                else if (headers.contains("image/webp")) mimeType="image/webp";
-                // Extract file data
-                int dataStart = (hEnd>=0?hEnd:0) + hSep.length;
-                byte[] endBound = ("\r\n--"+boundary+"--").getBytes(StandardCharsets.UTF_8);
-                int dataEnd = lastIndexOf(raw, endBound);
-                if (dataEnd < 0) {
-                    byte[] endBound2 = ("--"+boundary+"--").getBytes(StandardCharsets.UTF_8);
-                    dataEnd = lastIndexOf(raw, endBound2) - 2;
-                }
-                if (dataEnd <= dataStart) { respondJson(ex,400,"{\"error\":\"parse\"}"); return; }
-                byte[] fileData = Arrays.copyOfRange(raw, dataStart, dataEnd);
-                // Encode as base64 data URL — works on Railway (no filesystem dependency)
-                String b64 = Base64.getEncoder().encodeToString(fileData);
-                String dataUrl = "data:" + mimeType + ";base64," + b64;
-                respondJson(ex,200,"{\"ok\":true,\"url\":\""+dataUrl+"\"}");
-                P.println("[UPLOAD] "+fileData.length+" bytes, type="+mimeType);
-            } catch(Exception e){ respondJson(ex,500,"{\"error\":\""+jesc(e.getMessage())+"\"}"); }
-        });
+        srv.createContext("/api/posts",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("GET".equals(method)){respondJson(ex,200,arrJson(POSTS));return;}if("POST".equals(method)){Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}try{Map<String,Object>post=parseObj(body(ex));post.put("id",POSTID.getAndIncrement());post.put("author",s(t,"user"));post.put("date",today());post.put("ts",System.currentTimeMillis());post.put("likes",new ArrayList<>());post.put("comments",new ArrayList<>());POSTS.add(0,post);save();broadcast("post","{\"author\":\""+jesc(s(t,"user"))+"\"}");respondJson(ex,200,"{\"ok\":true,\"id\":"+post.get("id")+"}");}catch(Exception e){respondJson(ex,400,"{\"error\":\"bad\"}");} return;}if("DELETE".equals(method)){Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);String login=s(t,"user"),role=s(t,"role");POSTS.removeIf(p->toInt(p.get("id"))==id&&(s(p,"author").equals(login)||"admin".equals(role)||"owner".equals(role)));save();respondJson(ex,200,"{\"ok\":true}");}});
 
-        // Admin login
-        srv.createContext("/api/admin/login", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            String b = body(ex);
-            if (ADMIN_USER.equals(strVal(b,"user")) && ADMIN_PASS.equals(strVal(b,"pass"))) {
-                String tok = UUID.randomUUID().toString();
-                TOKENS.put(tok, System.currentTimeMillis());
-                respondJson(ex,200,"{\"token\":\""+tok+"\"}");
-                P.println("[ADMIN] Login OK");
-            } else { respondJson(ex,401,"{\"error\":\"wrong\"}"); }
-        });
+        srv.createContext("/api/posts/like",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}Map<String,Object>req=parseObj(body(ex));int id=toInt(req.get("id"));String login=s(t,"user");for(int i=0;i<POSTS.size();i++){if(toInt(POSTS.get(i).get("id"))==id){Map<String,Object>p=new LinkedHashMap<>(POSTS.get(i));@SuppressWarnings("unchecked")List<Object>likes=(List<Object>)p.getOrDefault("likes",new ArrayList<>());if(likes.contains(login))likes.remove(login);else likes.add(login);p.put("likes",likes);POSTS.set(i,p);break;}}save();respondJson(ex,200,"{\"ok\":true}");});
 
-        // Admin news
-        srv.createContext("/api/admin/news", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            String method = ex.getRequestMethod(), path = ex.getRequestURI().getPath();
-            if ("POST".equals(method)) {
-                Map<String,Object> n = parseObj(body(ex));
-                int id = NID.getAndIncrement();
-                n.put("id",id);
-                if(!n.containsKey("date")) n.put("date",today());
-                NEWS.add(0,n); save();
-                broadcast("news","{\"title\":\""+jesc(s(n,"title"))+"\",\"id\":"+id+"}");
-                respondJson(ex,200,"{\"ok\":true,\"id\":"+id+"}");
-                P.println("[NEWS] "+n.get("title"));
-            } else if ("PUT".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-1]);
-                Map<String,Object> upd=parseObj(body(ex)); upd.put("id",id);
-                for(int i=0;i<NEWS.size();i++){if(toInt(NEWS.get(i).get("id"))==id){Map<String,Object> m=new LinkedHashMap<>(NEWS.get(i));m.putAll(upd);NEWS.set(i,m);break;}}
-                save(); respondJson(ex,200,"{\"ok\":true}");
-            } else if ("DELETE".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-1]);
-                NEWS.removeIf(n->toInt(n.get("id"))==id); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            }
-        });
+        srv.createContext("/api/posts/comment",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}Map<String,Object>req=parseObj(body(ex));int id=toInt(req.get("id"));String text=s(req,"text").trim();if(text.isEmpty()){respondJson(ex,400,"{\"error\":\"empty\"}");return;}String login=s(t,"user"),nick=login;for(Map<String,Object>u:USERS){if(s(u,"login").equals(login)){nick=s(u,"nick");break;}}if("owner".equals(s(t,"role")))nick=OWNER_USER;if("admin".equals(s(t,"role")))nick=ADMIN_USER;Map<String,Object>comment=new LinkedHashMap<>();comment.put("author",login);comment.put("nick",nick);comment.put("text",text);comment.put("ts",System.currentTimeMillis());comment.put("date",today());for(int i=0;i<POSTS.size();i++){if(toInt(POSTS.get(i).get("id"))==id){Map<String,Object>p=new LinkedHashMap<>(POSTS.get(i));@SuppressWarnings("unchecked")List<Object>cmts=(List<Object>)p.getOrDefault("comments",new ArrayList<>());cmts.add(comment);p.put("comments",cmts);POSTS.set(i,p);broadcast("comment","{\"postId\":"+id+",\"author\":\""+jesc(nick)+"\"}");break;}}save();respondJson(ex,200,"{\"ok\":true}");});
 
-        // Admin results
-        srv.createContext("/api/admin/result", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            String method=ex.getRequestMethod(), path=ex.getRequestURI().getPath();
-            if ("POST".equals(method)) {
-                Map<String,Object> m=parseObj(body(ex)); m.put("id",MID.getAndIncrement());
-                MATCHES.add(0,m); recalc(); save(); respondJson(ex,200,"{\"ok\":true}");
-            } else if ("DELETE".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-1]);
-                MATCHES.removeIf(m->toInt(m.get("id"))==id); recalc(); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            }
-        });
+        srv.createContext("/api/messages",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath(),login=s(t,"user");if("GET".equals(method)){String[]pts=path.split("/");if(pts.length>3){String target=pts[pts.length-1];List<Map<String,Object>>conv=MESSAGES.stream().filter(m->(s(m,"from").equals(login)&&s(m,"to").equals(target))||(s(m,"from").equals(target)&&s(m,"to").equals(login))).sorted(Comparator.comparingLong(m->toLong(m.get("ts")))).collect(Collectors.toList());for(int i=0;i<MESSAGES.size();i++){Map<String,Object>m=MESSAGES.get(i);if(s(m,"from").equals(target)&&s(m,"to").equals(login)&&!"read".equals(s(m,"status"))){Map<String,Object>um=new LinkedHashMap<>(m);um.put("status","read");MESSAGES.set(i,um);}}respondJson(ex,200,arrJson(conv));}else{Map<String,Long>lastTs=new LinkedHashMap<>();Map<String,Map<String,Object>>lastMsg=new LinkedHashMap<>();Map<String,Integer>unread=new LinkedHashMap<>();for(Map<String,Object>m:MESSAGES){if(!s(m,"from").equals(login)&&!s(m,"to").equals(login))continue;String other=s(m,"from").equals(login)?s(m,"to"):s(m,"from");long ts=toLong(m.get("ts"));if(ts>lastTs.getOrDefault(other,0L)){lastTs.put(other,ts);lastMsg.put(other,m);}if(s(m,"to").equals(login)&&!"read".equals(s(m,"status")))unread.merge(other,1,Integer::sum);}List<Map<String,Object>>convs=new ArrayList<>();for(String other:lastTs.keySet()){Map<String,Object>c=new LinkedHashMap<>();c.put("with",other);c.put("lastMsg",lastMsg.get(other));c.put("unread",unread.getOrDefault(other,0));c.put("ts",lastTs.get(other));convs.add(c);}convs.sort((a,b2)->Long.compare(toLong(b2.get("ts")),toLong(a.get("ts"))));respondJson(ex,200,arrJson(convs));}return;}if("POST".equals(method)){try{Map<String,Object>req=parseObj(body(ex));String to=s(req,"to"),text=s(req,"text").trim();if(to.isEmpty()||text.isEmpty()){respondJson(ex,400,"{\"error\":\"empty\"}");return;}String nick=login;for(Map<String,Object>u:USERS){if(s(u,"login").equals(login)){nick=s(u,"nick");break;}}Map<String,Object>msg=new LinkedHashMap<>();msg.put("id",MSGID.getAndIncrement());msg.put("from",login);msg.put("fromNick",nick);msg.put("to",to);msg.put("text",text);msg.put("ts",System.currentTimeMillis());msg.put("status","sent");if(req.containsKey("img"))msg.put("img",s(req,"img"));MESSAGES.add(msg);save();broadcast("message","{\"from\":\""+jesc(login)+"\",\"fromNick\":\""+jesc(nick)+"\",\"to\":\""+jesc(to)+"\",\"text\":\""+jesc(text.length()>50?text.substring(0,50)+"...":text)+"\",\"ts\":"+msg.get("ts")+"}");respondJson(ex,200,"{\"ok\":true,\"id\":"+msg.get("id")+"}");}catch(Exception e){respondJson(ex,400,"{\"error\":\"bad\"}");}}});
 
-        // Admin players
-        srv.createContext("/api/admin/player", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            String method=ex.getRequestMethod(), path=ex.getRequestURI().getPath();
-            if ("POST".equals(method)) {
-                Map<String,Object> p=parseObj(body(ex));
-                if(!p.containsKey("id")) p.put("id","p"+PID.getAndIncrement());
-                PLAYERS.removeIf(x->s(x,"id").equals(s(p,"id")));
-                PLAYERS.add(p); save(); respondJson(ex,200,"{\"ok\":true}");
-            } else if ("DELETE".equals(method)) {
-                String[] pts=path.split("/"); String id=pts[pts.length-1];
-                PLAYERS.removeIf(p->id.equals(s(p,"id"))); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            }
-        });
+        srv.createContext("/api/cart",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String login=s(t,"user"),method=ex.getRequestMethod();if("GET".equals(method)){for(Map<String,Object>u:USERS){if(s(u,"login").equals(login)){@SuppressWarnings("unchecked")List<Object>cart=(List<Object>)u.getOrDefault("cart",new ArrayList<>());respondJson(ex,200,cart.isEmpty()?"[]":arrJsonRaw(cart));return;}}respondJson(ex,200,"[]");return;}if("POST".equals(method)){Map<String,Object>req=parseObj(body(ex));int itemId=toInt(req.get("itemId"));Map<String,Object>item=SHOP_ITEMS.stream().filter(i->toInt(i.get("id"))==itemId).findFirst().orElse(null);if(item==null){respondJson(ex,404,"{\"error\":\"item not found\"}");return;}for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(login)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));@SuppressWarnings("unchecked")List<Object>cart=new ArrayList<>((List<Object>)u.getOrDefault("cart",new ArrayList<>()));boolean exists=false;for(Object ci:cart){@SuppressWarnings("unchecked")Map<String,Object>cm=(Map<String,Object>)ci;if(toInt(cm.get("id"))==itemId){exists=true;break;}}if(!exists)cart.add(item);u.put("cart",cart);USERS.set(i,u);save();respondJson(ex,200,"{\"ok\":true}");return;}}}if("DELETE".equals(method)){String[]pts=ex.getRequestURI().getPath().split("/");int itemId=toInt(pts[pts.length-1]);for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(login)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));@SuppressWarnings("unchecked")List<Object>cart=new ArrayList<>((List<Object>)u.getOrDefault("cart",new ArrayList<>()));cart.removeIf(ci->{@SuppressWarnings("unchecked")Map<String,Object>cm=(Map<String,Object>)ci;return toInt(cm.get("id"))==itemId;});u.put("cart",cart);USERS.set(i,u);save();respondJson(ex,200,"{\"ok\":true}");return;}}}});
 
-        // Admin texts (edit all site texts)
-        srv.createContext("/api/admin/texts", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            if ("POST".equals(ex.getRequestMethod())) {
-                Map<String,Object> upd=parseObj(body(ex));
-                SITE_TEXTS.putAll(upd); save();
-                respondJson(ex,200,"{\"ok\":true}");
-                P.println("[TEXTS] Updated "+upd.size()+" texts");
-            }
-        });
+        srv.createContext("/api/cart/checkout",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String login=s(t,"user");for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(login)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));@SuppressWarnings("unchecked")List<Object>cart=new ArrayList<>((List<Object>)u.getOrDefault("cart",new ArrayList<>()));if(cart.isEmpty()){respondJson(ex,400,"{\"error\":\"cart empty\"}");return;}int total=0;for(Object ci:cart){@SuppressWarnings("unchecked")Map<String,Object>cm=(Map<String,Object>)ci;total+=toInt(cm.get("price"));}int pts=toInt(u.get("points"));if(pts<total){respondJson(ex,402,"{\"error\":\"Недостаточно очков\",\"need\":"+total+",\"have\":"+pts+"}");return;}u.put("points",pts-total);@SuppressWarnings("unchecked")List<Object>purchases=new ArrayList<>((List<Object>)u.getOrDefault("purchases",new ArrayList<>()));for(Object ci:cart){@SuppressWarnings("unchecked")Map<String,Object>cm=new LinkedHashMap<>((Map<String,Object>)ci);cm.put("date",today());purchases.add(cm);}u.put("purchases",purchases);u.put("cart",new ArrayList<>());USERS.set(i,u);save();respondJson(ex,200,"{\"ok\":true,\"spent\":"+total+"}");return;}}});
 
-        // Admin applications
-        srv.createContext("/api/admin/applications", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            String method=ex.getRequestMethod(), path=ex.getRequestURI().getPath();
-            if ("GET".equals(method)) {
-                respondJson(ex,200,arrJson(APPLICATIONS));
-            } else if ("PUT".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-2]); String action=pts[pts.length-1];
-                String st=action.equals("accept")?"accepted":"rejected";
-                for(int i=0;i<APPLICATIONS.size();i++){if(toInt(APPLICATIONS.get(i).get("id"))==id){Map<String,Object> u=new LinkedHashMap<>(APPLICATIONS.get(i));u.put("status",st);APPLICATIONS.set(i,u);break;}}
-                save(); broadcast("app_update","{\"id\":"+id+",\"status\":\""+action+"\"}");
-                respondJson(ex,200,"{\"ok\":true}");
-            } else if ("DELETE".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-1]);
-                APPLICATIONS.removeIf(a->toInt(a.get("id"))==id); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            }
-        });
+        srv.createContext("/api/tournaments",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("GET".equals(method)){respondJson(ex,200,arrJson(TOURNAMENTS));return;}if("POST".equals(method)){if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}Map<String,Object>tour=parseObj(body(ex));tour.put("id",TOURID.getAndIncrement());tour.put("date",today());TOURNAMENTS.add(tour);save();respondJson(ex,200,"{\"ok\":true,\"id\":"+tour.get("id")+"}");}if("DELETE".equals(method)){if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);TOURNAMENTS.removeIf(tr->toInt(tr.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
 
-        // Admin shop items
-        srv.createContext("/api/admin/shop", ex -> {
-            cors(ex);
-            if ("OPTIONS".equals(ex.getRequestMethod())) { respond(ex,200,"text/plain",""); return; }
-            if (!auth(ex)) { respondJson(ex,401,"{\"error\":\"unauth\"}"); return; }
-            String method=ex.getRequestMethod(), path=ex.getRequestURI().getPath();
-            if ("POST".equals(method)) {
-                Map<String,Object> item=parseObj(body(ex));
-                item.put("id",SID.getAndIncrement());
-                SHOP_ITEMS.add(item); save(); respondJson(ex,200,"{\"ok\":true}");
-            } else if ("DELETE".equals(method)) {
-                String[] pts=path.split("/"); int id=toInt(pts[pts.length-1]);
-                SHOP_ITEMS.removeIf(i->toInt(i.get("id"))==id); save();
-                respondJson(ex,200,"{\"ok\":true}");
-            }
-        });
+        srv.createContext("/api/match_results",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String method=ex.getRequestMethod();if("GET".equals(method)){respondJson(ex,200,arrJson(MATCH_RESULTS));return;}if("POST".equals(method)){Map<String,Object>t=getTok(ex);if(t==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}try{Map<String,Object>mr=parseObj(body(ex));mr.put("id",MRID.getAndIncrement());mr.put("date",today());mr.put("ts",System.currentTimeMillis());mr.put("submittedBy",s(t,"user"));mr.put("verified",false);MATCH_RESULTS.add(0,mr);save();broadcast("match_result","{\"p1\":\""+jesc(s(mr,"player1"))+"\"}");respondJson(ex,200,"{\"ok\":true,\"id\":"+mr.get("id")+"}");}catch(Exception e){respondJson(ex,400,"{\"error\":\"bad\"}");}}if("DELETE".equals(method)){if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String[]pts=ex.getRequestURI().getPath().split("/");int id=toInt(pts[pts.length-1]);MATCH_RESULTS.removeIf(m->toInt(m.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
 
-        // Admin users
-        srv.createContext("/api/admin/users", ex -> {
-            cors(ex);
-            if(!auth(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}
-            respondJson(ex,200,arrJson(USERS));
-        });
+        srv.createContext("/api/events",ex->{ex.getResponseHeaders().set("Content-Type","text/event-stream; charset=utf-8");ex.getResponseHeaders().set("Cache-Control","no-cache");ex.getResponseHeaders().set("Access-Control-Allow-Origin","*");ex.sendResponseHeaders(200,0);SSE.add(ex);try{while(!Thread.currentThread().isInterrupted()){Thread.sleep(20000);ex.getResponseBody().write(": ping\n\n".getBytes(StandardCharsets.UTF_8));ex.getResponseBody().flush();}}catch(Exception e){}finally{SSE.remove(ex);}});
 
-        // Thread pool
-        try {
-            Executor vt=(Executor)Executors.class.getMethod("newVirtualThreadPerTaskExecutor").invoke(null);
-            srv.setExecutor(vt);
-        } catch(Exception e) {
-            srv.setExecutor(Executors.newFixedThreadPool(Math.max(4,Runtime.getRuntime().availableProcessors()*2)));
-        }
+        srv.createContext("/api/upload",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(getTok(ex)==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}try{byte[]raw=ex.getRequestBody().readAllBytes();if(raw.length>MAX_UPLOAD){respondJson(ex,413,"{\"error\":\"too large\"}");return;}String ct=ex.getRequestHeaders().getFirst("Content-Type");if(ct==null||!ct.contains("multipart/form-data")){respondJson(ex,400,"{\"error\":\"need multipart\"}");return;}String boundary=ct.split("boundary=")[1].trim();byte[]hSep="\r\n\r\n".getBytes(StandardCharsets.UTF_8);int hEnd=indexOf(raw,hSep);String headers=hEnd>0?new String(raw,0,hEnd,StandardCharsets.UTF_8):new String(raw,0,Math.min(1024,raw.length),StandardCharsets.UTF_8);String mt="image/jpeg";if(headers.contains("image/png"))mt="image/png";else if(headers.contains("image/gif"))mt="image/gif";else if(headers.contains("image/webp"))mt="image/webp";int ds=(hEnd>=0?hEnd:0)+hSep.length;byte[]eb=("\r\n--"+boundary+"--").getBytes(StandardCharsets.UTF_8);int de=lastIndexOf(raw,eb);if(de<0){byte[]eb2=("--"+boundary+"--").getBytes(StandardCharsets.UTF_8);de=lastIndexOf(raw,eb2)-2;}if(de<=ds){respondJson(ex,400,"{\"error\":\"parse\"}");return;}byte[]fd=Arrays.copyOfRange(raw,ds,de);respondJson(ex,200,"{\"ok\":true,\"url\":\"data:"+mt+";base64,"+Base64.getEncoder().encodeToString(fd)+"\"}");} catch(Exception e){respondJson(ex,500,"{\"error\":\"upload failed\"}");}});
 
+        srv.createContext("/api/admin/login",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String b=body(ex),user=strVal(b,"user"),pass=strVal(b,"pass");if(OWNER_USER.equals(user)&&OWNER_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","owner","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"owner\"}");return;}if(ADMIN_USER.equals(user)&&ADMIN_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}for(Map<String,Object>adm:ADMINS){if(s(adm,"login").equals(user)&&s(adm,"pass").equals(sha256(pass))){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}}respondJson(ex,401,"{\"error\":\"wrong\"}");});
+
+        srv.createContext("/api/admin/news",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("POST".equals(method)){Map<String,Object>n=parseObj(body(ex));int id=NID.getAndIncrement();n.put("id",id);if(!n.containsKey("date"))n.put("date",today());NEWS.add(0,n);save();broadcast("news","{\"title\":\""+jesc(s(n,"title"))+"\",\"id\":"+id+"}");respondJson(ex,200,"{\"ok\":true,\"id\":"+id+"}");}else if("PUT".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);Map<String,Object>upd=parseObj(body(ex));upd.put("id",id);for(int i=0;i<NEWS.size();i++){if(toInt(NEWS.get(i).get("id"))==id){Map<String,Object>m=new LinkedHashMap<>(NEWS.get(i));m.putAll(upd);NEWS.set(i,m);break;}}save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);NEWS.removeIf(n->toInt(n.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/result",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("POST".equals(method)){Map<String,Object>m=parseObj(body(ex));m.put("id",MID.getAndIncrement());MATCHES.add(0,m);recalc();save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);MATCHES.removeIf(m->toInt(m.get("id"))==id);recalc();save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/player",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("POST".equals(method)){Map<String,Object>p=parseObj(body(ex));if(!p.containsKey("id"))p.put("id","p"+PID.getAndIncrement());PLAYERS.removeIf(x->s(x,"id").equals(s(p,"id")));PLAYERS.add(p);save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");String id=pts[pts.length-1];PLAYERS.removeIf(p->id.equals(s(p,"id")));save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/texts",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}if("POST".equals(ex.getRequestMethod())){Map<String,Object>upd=parseObj(body(ex));SITE_TEXTS.putAll(upd);save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/applications",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("GET".equals(method)){respondJson(ex,200,arrJson(APPLICATIONS));}else if("PUT".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-2]);String action=pts[pts.length-1];String st=action.equals("accept")?"accepted":"rejected";for(int i=0;i<APPLICATIONS.size();i++){if(toInt(APPLICATIONS.get(i).get("id"))==id){Map<String,Object>u=new LinkedHashMap<>(APPLICATIONS.get(i));u.put("status",st);APPLICATIONS.set(i,u);break;}}save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);APPLICATIONS.removeIf(a->toInt(a.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/shop",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("POST".equals(method)){Map<String,Object>item=parseObj(body(ex));item.put("id",SID.getAndIncrement());SHOP_ITEMS.add(item);save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);SHOP_ITEMS.removeIf(i->toInt(i.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/admin/users",ex->{cors(ex);if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}List<Map<String,Object>>safe=USERS.stream().map(u->{Map<String,Object>s2=new LinkedHashMap<>(u);s2.remove("passHash");return s2;}).collect(Collectors.toList());respondJson(ex,200,arrJson(safe));});
+        srv.createContext("/api/admin/posts",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}if("DELETE".equals(ex.getRequestMethod())){String[]pts=ex.getRequestURI().getPath().split("/");int id=toInt(pts[pts.length-1]);POSTS.removeIf(p->toInt(p.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/owner/admins",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isOwner(ex)){respondJson(ex,403,"{\"error\":\"owner only\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("GET".equals(method)){List<Map<String,Object>>safe=ADMINS.stream().map(a->{Map<String,Object>s2=new LinkedHashMap<>(a);s2.remove("pass");return s2;}).collect(Collectors.toList());respondJson(ex,200,arrJson(safe));}else if("POST".equals(method)){Map<String,Object>req=parseObj(body(ex));String login=s(req,"login").trim(),nick=s(req,"nick").trim(),pass=s(req,"pass");if(login.isEmpty()||pass.isEmpty()){respondJson(ex,400,"{\"error\":\"fill all\"}");return;}Map<String,Object>adm=new LinkedHashMap<>();adm.put("id","a"+System.currentTimeMillis());adm.put("login",login);adm.put("nick",nick.isEmpty()?login:nick);adm.put("pass",sha256(pass));adm.put("date",today());ADMINS.add(adm);save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");String id=pts[pts.length-1];ADMINS.removeIf(a->id.equals(s(a,"id")));save();respondJson(ex,200,"{\"ok\":true}");}});
+        srv.createContext("/api/owner/points",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isOwner(ex)){respondJson(ex,403,"{\"error\":\"owner only\"}");return;}Map<String,Object>req=parseObj(body(ex));String login=s(req,"login");int delta=toInt(req.get("delta"));boolean found=false;for(int i=0;i<USERS.size();i++){if(s(USERS.get(i),"login").equals(login)){Map<String,Object>u=new LinkedHashMap<>(USERS.get(i));u.put("points",Math.max(0,toInt(u.get("points"))+delta));USERS.set(i,u);found=true;save();break;}}respondJson(ex,found?200:404,found?"{\"ok\":true}":"{\"error\":\"user not found\"}");});
+        srv.createContext("/api/owner/stats",ex->{cors(ex);if(!isOwner(ex)){respondJson(ex,403,"{\"error\":\"owner only\"}");return;}respondJson(ex,200,String.format("{\"users\":%d,\"news\":%d,\"matches\":%d,\"applications\":%d,\"admins\":%d,\"shopItems\":%d,\"scores\":%d,\"posts\":%d,\"messages\":%d,\"tournaments\":%d}",USERS.size(),NEWS.size(),MATCHES.size(),APPLICATIONS.size(),ADMINS.size(),SHOP_ITEMS.size(),SCORES.size(),POSTS.size(),MESSAGES.size(),TOURNAMENTS.size()));});
+
+        try{Executor vt=(Executor)Executors.class.getMethod("newVirtualThreadPerTaskExecutor").invoke(null);srv.setExecutor(vt);}
+        catch(Exception e){srv.setExecutor(Executors.newFixedThreadPool(Math.max(4,Runtime.getRuntime().availableProcessors()*2)));}
         srv.start();
         P.println("[HTTP] ✅ http://localhost:"+PORT);
-        P.println("[AUTH] "+ADMIN_USER+" / "+ADMIN_PASS);
+        P.println("[OWNER] "+OWNER_USER+" / "+OWNER_PASS);
+        P.println("[ADMIN] "+ADMIN_USER+" / "+ADMIN_PASS);
     }
 
-    // ── SSE BROADCAST ────────────────────────────────────
-    static void broadcast(String event, String data) {
-        byte[] b=("event:"+event+"\ndata:"+data+"\n\n").getBytes(StandardCharsets.UTF_8);
-        List<HttpExchange> dead=new ArrayList<>();
-        for(HttpExchange ex:SSE){try{ex.getResponseBody().write(b);ex.getResponseBody().flush();}catch(Exception e){dead.add(ex);}}
-        SSE.removeAll(dead);
-    }
-
-    // ── STANDINGS ────────────────────────────────────────
-    static void recalc() {
-        LinkedHashMap<String,int[]> st=new LinkedHashMap<>();
-        for(Map<String,Object> m:MATCHES){
-            String t1=s(m,"team1"),t2=s(m,"team2"); int s1=toInt(m.get("score1")),s2=toInt(m.get("score2"));
-            st.putIfAbsent(t1,new int[7]); st.putIfAbsent(t2,new int[7]);
-            int[] a=st.get(t1),b=st.get(t2);
-            a[0]++;b[0]++;a[4]+=s1;a[5]+=s2;b[4]+=s2;b[5]+=s1;
-            if(s1>s2){a[1]++;a[6]+=3;b[3]++;}else if(s1<s2){b[1]++;b[6]+=3;a[3]++;}else{a[2]++;b[2]++;a[6]++;b[6]++;}
-        }
-        TABLE.clear();
-        st.entrySet().stream().sorted((x,y)->Integer.compare(y.getValue()[6],x.getValue()[6])).forEach(e->{
-            int[] v=e.getValue(); Map<String,Object> r=new LinkedHashMap<>();
-            r.put("name",e.getKey());r.put("played",v[0]);r.put("won",v[1]);r.put("draw",v[2]);r.put("lost",v[3]);r.put("gf",v[4]);r.put("ga",v[5]);r.put("pts",v[6]);
-            TABLE.add(r);
-        });
-    }
-
-    // ── PERSISTENCE ──────────────────────────────────────
-    static void save() {
-        try {
-            write(DATA_DIR+"/news.json",    arrJson(NEWS));
-            write(DATA_DIR+"/matches.json", arrJson(MATCHES));
-            write(DATA_DIR+"/players.json", arrJson(PLAYERS));
-            write(DATA_DIR+"/users.json",   arrJson(USERS));
-            write(DATA_DIR+"/apps.json",    arrJson(APPLICATIONS));
-            write(DATA_DIR+"/shop.json",    arrJson(SHOP_ITEMS));
-            write(DATA_DIR+"/scores.json",  arrJson(SCORES));
-            write(DATA_DIR+"/texts.json",   mapJson(SITE_TEXTS));
-        } catch(Exception e){ P.println("[SAVE] "+e.getMessage()); }
-    }
-
-    static void load() {
-        try{loadFile(DATA_DIR+"/news.json",    NEWS);}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/matches.json", MATCHES);recalc();}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/players.json", PLAYERS);}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/users.json",   USERS);}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/apps.json",    APPLICATIONS);}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/shop.json",    SHOP_ITEMS);}catch(Exception e){}
-        try{loadFile(DATA_DIR+"/scores.json",  SCORES);}catch(Exception e){}
-        try{
-            String txt=Files.readString(Path.of(DATA_DIR+"/texts.json"),StandardCharsets.UTF_8).trim();
-            if(txt.startsWith("{")){ Map<String,Object> m=parseObj(txt); SITE_TEXTS.putAll(m); }
-        }catch(Exception e){}
-        // fix ID counters
-        NEWS.forEach(n->{int id=toInt(n.get("id"));if(id>=NID.get())NID.set(id+1);});
-        MATCHES.forEach(m->{int id=toInt(m.get("id"));if(id>=MID.get())MID.set(id+1);});
-        APPLICATIONS.forEach(a->{int id=toInt(a.get("id"));if(id>=AID.get())AID.set(id+1);});
-        P.println("[LOAD] news="+NEWS.size()+" matches="+MATCHES.size()+" players="+PLAYERS.size()+" apps="+APPLICATIONS.size());
-    }
-
-    static void loadFile(String path, List<Map<String,Object>> list) throws Exception {
-        String txt=Files.readString(Path.of(path),StandardCharsets.UTF_8).trim();
-        if(!txt.startsWith("[")||txt.length()<2) return;
-        String inner=txt.substring(1,txt.length()-1).trim();
-        if(inner.isEmpty()) return;
-        for(String chunk:topObjects(inner)){Map<String,Object> m=parseObj(chunk);if(!m.isEmpty())list.add(m);}
-    }
-
-    // ── SEED DATA ────────────────────────────────────────
-    static void seedIfEmpty() {
-        if(NEWS.isEmpty()){
-            addNews("🏆 Новый сезон!","Psycho League открывает новый турнирный сезон. Записывайтесь!","АНОНС","PaNdA",null,null);
-            addNews("⚡ Рекорд!","240,712 голов — абсолютный рекорд Psycho League!","РЕКОРД","PaNdA",null,null);
-            addNews("👥 185 участников","Обе лиги суммарно 185 активных игроков!","НОВОСТЬ","Psycho",null,null);
-        }
-        if(MATCHES.isEmpty()){
-            addMatch("PaNdA","Psycho",5,2,"20.04.2026");addMatch("Zenith","Kaiser",3,3,"21.04.2026");
-            addMatch("Titan","PaNdA",1,4,"22.04.2026");addMatch("Psycho","Titan",6,0,"23.04.2026");
-            addMatch("Kaiser","Zenith",2,1,"24.04.2026");recalc();
-        }
-        if(SHOP_ITEMS.isEmpty()){
-            Map<String,Object> s1=new LinkedHashMap<>();s1.put("id",SID.getAndIncrement());s1.put("name","Временный Админ (1 день)");s1.put("description","Доступ к панели управления на 24 часа");s1.put("price",500);s1.put("icon","👑");s1.put("type","admin_temp");SHOP_ITEMS.add(s1);
-            Map<String,Object> s2=new LinkedHashMap<>();s2.put("id",SID.getAndIncrement());s2.put("name","VIP Статус");s2.put("description","Специальная иконка рядом с ником");s2.put("price",200);s2.put("icon","⭐");s2.put("type","vip");SHOP_ITEMS.add(s2);
-            Map<String,Object> s3=new LinkedHashMap<>();s3.put("id",SID.getAndIncrement());s3.put("name","Кастомная карточка");s3.put("description","Уникальный дизайн карточки игрока");s3.put("price",300);s3.put("icon","🎨");s3.put("type","card");SHOP_ITEMS.add(s3);
-        }
-        if(SITE_TEXTS.isEmpty()){
-            SITE_TEXTS.put("hero_title","PSYCHO LEAGUE");
-            SITE_TEXTS.put("hero_sub","EA FC MOBILE · OFFICIAL COMMUNITY HUB");
-            SITE_TEXTS.put("pl1_name","Psycho League · PaNdA");
-            SITE_TEXTS.put("pl1_members","85");SITE_TEXTS.put("pl1_goals","240712");SITE_TEXTS.put("pl1_obr","12116");SITE_TEXTS.put("pl1_wins","161");
-            SITE_TEXTS.put("pl2_name","Psycho League 2 · Psycho");
-            SITE_TEXTS.put("pl2_members","100");SITE_TEXTS.put("pl2_goals","98871");SITE_TEXTS.put("pl2_obr","12061");SITE_TEXTS.put("pl2_wins","40");
-            SITE_TEXTS.put("apply_info","Заполни форму и отправь заявку. Администратор рассмотрит её в течение 24 часов.");
-        }
-        save();
-    }
-
-    static void addNews(String title,String body,String cat,String author,String img,String video){
-        Map<String,Object> n=new LinkedHashMap<>();n.put("id",NID.getAndIncrement());n.put("title",title);n.put("body",body);n.put("category",cat);n.put("author",author);n.put("date",today());if(img!=null)n.put("img",img);if(video!=null)n.put("video",video);NEWS.add(n);
-    }
-    static void addMatch(String t1,String t2,int s1,int s2,String date){
-        Map<String,Object> m=new LinkedHashMap<>();m.put("id",MID.getAndIncrement());m.put("team1",t1);m.put("team2",t2);m.put("score1",s1);m.put("score2",s2);m.put("date",date);MATCHES.add(m);
-    }
-
-    // ── HTTP HELPERS ─────────────────────────────────────
-    static void respond(HttpExchange ex,int code,String ct,String body) throws IOException{respond(ex,code,ct,body.getBytes(StandardCharsets.UTF_8));}
-    static void respond(HttpExchange ex,int code,String ct,byte[] body) throws IOException{
-        Headers h=ex.getResponseHeaders();h.set("Content-Type",ct);h.set("Access-Control-Allow-Origin","*");h.set("Access-Control-Allow-Headers","Content-Type,Authorization");h.set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
-        ex.sendResponseHeaders(code,body.length);try(OutputStream os=ex.getResponseBody()){os.write(body);}
-    }
-    static void respondJson(HttpExchange ex,int code,String json) throws IOException{respond(ex,code,"application/json; charset=utf-8",json);}
+    static void broadcast(String event,String data){byte[]b=("event:"+event+"\ndata:"+data+"\n\n").getBytes(StandardCharsets.UTF_8);List<HttpExchange>dead=new ArrayList<>();for(HttpExchange ex:SSE){try{ex.getResponseBody().write(b);ex.getResponseBody().flush();}catch(Exception e){dead.add(ex);}}SSE.removeAll(dead);}
+    static void recalc(){LinkedHashMap<String,int[]>st=new LinkedHashMap<>();for(Map<String,Object>m:MATCHES){String t1=s(m,"team1"),t2=s(m,"team2");int s1=toInt(m.get("score1")),s2=toInt(m.get("score2"));st.putIfAbsent(t1,new int[7]);st.putIfAbsent(t2,new int[7]);int[]a=st.get(t1),b=st.get(t2);a[0]++;b[0]++;a[4]+=s1;a[5]+=s2;b[4]+=s2;b[5]+=s1;if(s1>s2){a[1]++;a[6]+=3;b[3]++;}else if(s1<s2){b[1]++;b[6]+=3;a[3]++;}else{a[2]++;b[2]++;a[6]++;b[6]++;}}TABLE.clear();st.entrySet().stream().sorted((x,y)->Integer.compare(y.getValue()[6],x.getValue()[6])).forEach(e->{int[]v=e.getValue();Map<String,Object>r=new LinkedHashMap<>();r.put("name",e.getKey());r.put("played",v[0]);r.put("won",v[1]);r.put("draw",v[2]);r.put("lost",v[3]);r.put("gf",v[4]);r.put("ga",v[5]);r.put("pts",v[6]);TABLE.add(r);});}
+    static void save(){try{write(DATA_DIR+"/news.json",arrJson(NEWS));write(DATA_DIR+"/matches.json",arrJson(MATCHES));write(DATA_DIR+"/players.json",arrJson(PLAYERS));write(DATA_DIR+"/users.json",arrJson(USERS));write(DATA_DIR+"/apps.json",arrJson(APPLICATIONS));write(DATA_DIR+"/shop.json",arrJson(SHOP_ITEMS));write(DATA_DIR+"/scores.json",arrJson(SCORES));write(DATA_DIR+"/admins.json",arrJson(ADMINS));write(DATA_DIR+"/texts.json",objJson(SITE_TEXTS));write(DATA_DIR+"/posts.json",arrJson(POSTS));write(DATA_DIR+"/messages.json",arrJson(MESSAGES));write(DATA_DIR+"/tournaments.json",arrJson(TOURNAMENTS));write(DATA_DIR+"/match_results.json",arrJson(MATCH_RESULTS));}catch(Exception e){P.println("[SAVE] "+e.getMessage());}}
+    static void load(){try{loadL(DATA_DIR+"/news.json",NEWS);}catch(Exception e){}try{loadL(DATA_DIR+"/matches.json",MATCHES);recalc();}catch(Exception e){}try{loadL(DATA_DIR+"/players.json",PLAYERS);}catch(Exception e){}try{loadL(DATA_DIR+"/users.json",USERS);}catch(Exception e){}try{loadL(DATA_DIR+"/apps.json",APPLICATIONS);}catch(Exception e){}try{loadL(DATA_DIR+"/shop.json",SHOP_ITEMS);}catch(Exception e){}try{loadL(DATA_DIR+"/scores.json",SCORES);}catch(Exception e){}try{loadL(DATA_DIR+"/admins.json",ADMINS);}catch(Exception e){}try{loadL(DATA_DIR+"/posts.json",POSTS);}catch(Exception e){}try{loadL(DATA_DIR+"/messages.json",MESSAGES);}catch(Exception e){}try{loadL(DATA_DIR+"/tournaments.json",TOURNAMENTS);}catch(Exception e){}try{loadL(DATA_DIR+"/match_results.json",MATCH_RESULTS);}catch(Exception e){}try{String txt=Files.readString(Path.of(DATA_DIR+"/texts.json"),StandardCharsets.UTF_8).trim();if(txt.startsWith("{"))SITE_TEXTS.putAll(parseObj(txt));}catch(Exception e){}NEWS.forEach(n->{int id=toInt(n.get("id"));if(id>=NID.get())NID.set(id+1);});MATCHES.forEach(m->{int id=toInt(m.get("id"));if(id>=MID.get())MID.set(id+1);});USERS.forEach(u->{int id=toInt(u.get("id"));if(id>=UID.get())UID.set(id+1);});POSTS.forEach(p->{int id=toInt(p.get("id"));if(id>=POSTID.get())POSTID.set(id+1);});MESSAGES.forEach(m->{int id=toInt(m.get("id"));if(id>=MSGID.get())MSGID.set(id+1);});P.println("[LOAD] users="+USERS.size()+" news="+NEWS.size()+" posts="+POSTS.size()+" msgs="+MESSAGES.size());}
+    static void loadL(String path,List<Map<String,Object>>list)throws Exception{String txt=Files.readString(Path.of(path),StandardCharsets.UTF_8).trim();if(!txt.startsWith("[")||txt.length()<2)return;String inner=txt.substring(1,txt.length()-1).trim();if(inner.isEmpty())return;for(String chunk:topObjs(inner)){Map<String,Object>m=parseObj(chunk);if(!m.isEmpty())list.add(m);}}
+    static void seedIfEmpty(){if(NEWS.isEmpty()){mkN("🏆 Новый сезон!","Psycho League открывает новый сезон!","АНОНС","PaNdA");mkN("⚡ Рекорд!","240,712 голов!","РЕКОРД","PaNdA");mkN("👥 185 участников","Суммарно 185 активных!","НОВОСТЬ","Psycho");}if(MATCHES.isEmpty()){mkM("PaNdA","Psycho",5,2,"20.04.2026");mkM("Zenith","Kaiser",3,3,"21.04.2026");mkM("Titan","PaNdA",1,4,"22.04.2026");mkM("Psycho","Titan",6,0,"23.04.2026");recalc();}if(SHOP_ITEMS.isEmpty()){mkS("Временный Админ","Доступ к панели на 24 часа","👑",500,"admin_temp");mkS("VIP Статус","Метка рядом с ником","⭐",200,"vip");mkS("Кастомная карточка","Уникальный дизайн","🎨",300,"card");mkS("Эксклюзивный аватар","Редкий аватар","🔥",150,"avatar");mkS("Буст очков x2","Двойные очки в квизе","⚡",250,"boost");}if(SITE_TEXTS.isEmpty()){SITE_TEXTS.put("hero_sub","EA FC MOBILE · OFFICIAL COMMUNITY HUB");SITE_TEXTS.put("pl1_name","⚡ Psycho League · PaNdA");SITE_TEXTS.put("pl1_members","85");SITE_TEXTS.put("pl1_goals","240712");SITE_TEXTS.put("pl1_obr","12116");SITE_TEXTS.put("pl1_wins","161");SITE_TEXTS.put("pl2_name","🔥 Psycho League 2 · Psycho");SITE_TEXTS.put("pl2_members","100");SITE_TEXTS.put("pl2_goals","98871");SITE_TEXTS.put("pl2_obr","12061");SITE_TEXTS.put("pl2_wins","40");}save();}
+    static void mkN(String t,String b,String c,String a){Map<String,Object>n=new LinkedHashMap<>();n.put("id",NID.getAndIncrement());n.put("title",t);n.put("body",b);n.put("category",c);n.put("author",a);n.put("date",today());NEWS.add(n);}
+    static void mkM(String t1,String t2,int s1,int s2,String date){Map<String,Object>m=new LinkedHashMap<>();m.put("id",MID.getAndIncrement());m.put("team1",t1);m.put("team2",t2);m.put("score1",s1);m.put("score2",s2);m.put("date",date);MATCHES.add(m);}
+    static void mkS(String name,String desc,String icon,int price,String type){Map<String,Object>i=new LinkedHashMap<>();i.put("id",SID.getAndIncrement());i.put("name",name);i.put("description",desc);i.put("icon",icon);i.put("price",price);i.put("type",type);SHOP_ITEMS.add(i);}
+    @SuppressWarnings("unchecked")
+    static String arrJsonRaw(List<Object>list){return"["+list.stream().map(item->{if(item instanceof Map)return objJson((Map<String,Object>)item);if(item instanceof Number)return String.valueOf(item);return"\""+jesc(String.valueOf(item))+"\"";}).collect(Collectors.joining(","))+"]";}
+    static void respond(HttpExchange ex,int code,String ct,String body)throws IOException{respond(ex,code,ct,body.getBytes(StandardCharsets.UTF_8));}
+    static void respond(HttpExchange ex,int code,String ct,byte[]body)throws IOException{Headers h=ex.getResponseHeaders();h.set("Content-Type",ct);h.set("Access-Control-Allow-Origin","*");h.set("Access-Control-Allow-Headers","Content-Type,Authorization");h.set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");ex.sendResponseHeaders(code,body.length);try(OutputStream os=ex.getResponseBody()){os.write(body);}}
+    static void respondJson(HttpExchange ex,int code,String json)throws IOException{respond(ex,code,"application/json; charset=utf-8",json);}
     static void cors(HttpExchange ex){ex.getResponseHeaders().set("Access-Control-Allow-Origin","*");ex.getResponseHeaders().set("Access-Control-Allow-Headers","Content-Type,Authorization");ex.getResponseHeaders().set("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");}
-    static boolean auth(HttpExchange ex){String tok=ex.getRequestHeaders().getFirst("Authorization");if(tok==null||tok.isEmpty())return false;Long ts=TOKENS.get(tok);if(ts==null)return false;if(System.currentTimeMillis()-ts>86_400_000L){TOKENS.remove(tok);return false;}return true;}
-    static String body(HttpExchange ex) throws IOException{return new String(ex.getRequestBody().readAllBytes(),StandardCharsets.UTF_8);}
+    static Map<String,Object> getTok(HttpExchange ex){String tok=ex.getRequestHeaders().getFirst("Authorization");if(tok==null||tok.isEmpty())return null;Map<String,Object>t=TOKENS.get(tok);if(t==null)return null;if(System.currentTimeMillis()-toLong(t.get("ts"))>86_400_000L){TOKENS.remove(tok);return null;}return t;}
+    static boolean isMinAdmin(HttpExchange ex){Map<String,Object>t=getTok(ex);if(t==null)return false;String r=s(t,"role");return"admin".equals(r)||"owner".equals(r);}
+    static boolean isOwner(HttpExchange ex){Map<String,Object>t=getTok(ex);if(t==null)return false;return"owner".equals(s(t,"role"));}
+    static String body(HttpExchange ex)throws IOException{return new String(ex.getRequestBody().readAllBytes(),StandardCharsets.UTF_8);}
     static String mime(String p){if(p.endsWith(".html"))return"text/html; charset=utf-8";if(p.endsWith(".css"))return"text/css";if(p.endsWith(".js"))return"application/javascript";if(p.endsWith(".png"))return"image/png";if(p.endsWith(".jpg")||p.endsWith(".jpeg"))return"image/jpeg";if(p.endsWith(".gif"))return"image/gif";if(p.endsWith(".svg"))return"image/svg+xml";if(p.endsWith(".ico"))return"image/x-icon";return"application/octet-stream";}
     static String today(){return LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));}
-
-    // ── JSON SERIALIZER ──────────────────────────────────
-    static String arrJson(List<Map<String,Object>> list){return"["+list.stream().map(Server::objJson).collect(Collectors.joining(","))+"]";}
-    static String mapJson(Map<String,Object> map){return objJson(map);}
+    static String genTok(){return UUID.randomUUID().toString();}
+    static String sha256(String input){try{MessageDigest md=MessageDigest.getInstance("SHA-256");byte[]h=md.digest(input.getBytes(StandardCharsets.UTF_8));StringBuilder sb=new StringBuilder();for(byte b:h)sb.append(String.format("%02x",b));return sb.toString();}catch(Exception e){return input;}}
+    static String arrJson(List<Map<String,Object>>list){return"["+list.stream().map(Server::objJson).collect(Collectors.joining(","))+"]";}
     @SuppressWarnings("unchecked")
-    static String objJson(Map<String,Object> map){
-        StringBuilder sb=new StringBuilder("{");boolean first=true;
-        for(var e:map.entrySet()){if(!first)sb.append(",");first=false;sb.append("\"").append(jesc(e.getKey())).append("\":");Object v=e.getValue();
-            if(v==null)sb.append("null");else if(v instanceof Boolean)sb.append(v);else if(v instanceof Number)sb.append(v);
-            else if(v instanceof List){sb.append("[");boolean f2=true;for(Object item:(List<?>)v){if(!f2)sb.append(",");f2=false;if(item instanceof List)sb.append(innerArr((List<?>)item));else if(item instanceof Map)sb.append(objJson((Map<String,Object>)item));else if(item instanceof Number)sb.append(item);else sb.append("\"").append(jesc(String.valueOf(item))).append("\"");}sb.append("]");}
-            else if(v instanceof Map)sb.append(objJson((Map<String,Object>)v));
-            else sb.append("\"").append(jesc(String.valueOf(v))).append("\"");}
-        return sb.append("}").toString();
-    }
-    static String innerArr(List<?> l){StringBuilder sb=new StringBuilder("[");boolean f=true;for(Object x:l){if(!f)sb.append(",");f=false;if(x instanceof Number)sb.append(x);else sb.append("\"").append(jesc(String.valueOf(x))).append("\"");}return sb.append("]").toString();}
-
-    // ── JSON PARSER ──────────────────────────────────────
-    static Map<String,Object> parseObj(String raw){
-        Map<String,Object> map=new LinkedHashMap<>();raw=raw.trim();
-        if(!raw.startsWith("{"))return map;raw=raw.substring(1,raw.length()-1);int i=0,len=raw.length();
-        while(i<len){while(i<len&&" \t\n\r,".indexOf(raw.charAt(i))>=0)i++;if(i>=len||raw.charAt(i)!='"')break;
-            int ks=i+1,ke=ks;while(ke<len&&raw.charAt(ke)!='"')ke++;String key=raw.substring(ks,ke);i=ke+1;
-            while(i<len&&raw.charAt(i)!=':')i++;i++;while(i<len&&" \t".indexOf(raw.charAt(i))>=0)i++;
-            if(i>=len)break; char c=raw.charAt(i);
-            if(c=='"'){int vs=i+1,ve=vs;while(ve<len){if(raw.charAt(ve)=='\\'){ ve+=2;continue;}if(raw.charAt(ve)=='"')break;ve++;}map.put(key,unesc(raw.substring(vs,ve)));i=ve+1;}
-            else if(c=='{'){int e=mc(raw,i,'{','}');map.put(key,parseObj(raw.substring(i,e+1)));i=e+1;}
-            else if(c=='['){int e=mc(raw,i,'[',']');map.put(key,parseArr(raw.substring(i,e+1)));i=e+1;}
-            else if(c=='t'){map.put(key,true);i+=4;}else if(c=='f'){map.put(key,false);i+=5;}else if(c=='n'){map.put(key,null);i+=4;}
-            else{int ne=i;while(ne<len&&",}]".indexOf(raw.charAt(ne))<0)ne++;String ns=raw.substring(i,ne).trim();try{map.put(key,Integer.parseInt(ns));}catch(NumberFormatException ex2){try{map.put(key,Long.parseLong(ns));}catch(NumberFormatException ex3){try{map.put(key,Double.parseDouble(ns));}catch(NumberFormatException ex4){map.put(key,ns);}}}i=ne;}}
-        return map;
-    }
-    static List<Object> parseArr(String raw){
-        List<Object> list=new ArrayList<>();raw=raw.trim();if(!raw.startsWith("["))return list;raw=raw.substring(1,raw.length()-1).trim();if(raw.isEmpty())return list;
-        int i=0,len=raw.length();
-        while(i<len){while(i<len&&" ,\t\n\r".indexOf(raw.charAt(i))>=0)i++;if(i>=len)break;char c=raw.charAt(i);
-            if(c=='"'){int vs=i+1,ve=vs;while(ve<len){if(raw.charAt(ve)=='\\'){ ve+=2;continue;}if(raw.charAt(ve)=='"')break;ve++;}list.add(unesc(raw.substring(vs,ve)));i=ve+1;}
-            else if(c=='['){int e=mc(raw,i,'[',']');list.add(parseArr(raw.substring(i,e+1)));i=e+1;}
-            else if(c=='{'){int e=mc(raw,i,'{','}');list.add(parseObj(raw.substring(i,e+1)));i=e+1;}
-            else{int ne=i;while(ne<len&&",]".indexOf(raw.charAt(ne))<0)ne++;String ns=raw.substring(i,ne).trim();if(ns.equals("true"))list.add(true);else if(ns.equals("false"))list.add(false);else if(ns.equals("null"))list.add(null);else try{list.add(Integer.parseInt(ns));}catch(NumberFormatException e){try{list.add(Long.parseLong(ns));}catch(NumberFormatException e2){list.add(ns);}}i=ne;}}
-        return list;
-    }
+    static String objJson(Map<String,Object>map){StringBuilder sb=new StringBuilder("{");boolean first=true;for(var e:map.entrySet()){if(!first)sb.append(",");first=false;sb.append("\"").append(jesc(e.getKey())).append("\":");Object v=e.getValue();if(v==null)sb.append("null");else if(v instanceof Boolean)sb.append(v);else if(v instanceof Number)sb.append(v);else if(v instanceof List){sb.append("[");boolean f2=true;for(Object item:(List<?>)v){if(!f2)sb.append(",");f2=false;if(item instanceof List)sb.append(innerArr((List<?>)item));else if(item instanceof Map)sb.append(objJson((Map<String,Object>)item));else if(item instanceof Number)sb.append(item);else sb.append("\"").append(jesc(String.valueOf(item))).append("\"");}sb.append("]");}else if(v instanceof Map)sb.append(objJson((Map<String,Object>)v));else sb.append("\"").append(jesc(String.valueOf(v))).append("\"");}return sb.append("}").toString();}
+    static String innerArr(List<?>l){StringBuilder sb=new StringBuilder("[");boolean f=true;for(Object x:l){if(!f)sb.append(",");f=false;if(x instanceof Number)sb.append(x);else sb.append("\"").append(jesc(String.valueOf(x))).append("\"");}return sb.append("]").toString();}
+    static Map<String,Object> parseObj(String raw){Map<String,Object>map=new LinkedHashMap<>();raw=raw.trim();if(!raw.startsWith("{"))return map;raw=raw.substring(1,raw.length()-1);int i=0,len=raw.length();while(i<len){while(i<len&&" \t\n\r,".indexOf(raw.charAt(i))>=0)i++;if(i>=len||raw.charAt(i)!='"')break;int ks=i+1,ke=ks;while(ke<len&&raw.charAt(ke)!='"')ke++;String key=raw.substring(ks,ke);i=ke+1;while(i<len&&raw.charAt(i)!=':')i++;i++;while(i<len&&" \t".indexOf(raw.charAt(i))>=0)i++;if(i>=len)break;char c=raw.charAt(i);if(c=='"'){int vs=i+1,ve=vs;while(ve<len){if(raw.charAt(ve)=='\\'){ ve+=2;continue;}if(raw.charAt(ve)=='"')break;ve++;}map.put(key,unesc(raw.substring(vs,ve)));i=ve+1;}else if(c=='{'){int e=mc(raw,i,'{','}');map.put(key,parseObj(raw.substring(i,e+1)));i=e+1;}else if(c=='['){int e=mc(raw,i,'[',']');map.put(key,parseArr(raw.substring(i,e+1)));i=e+1;}else if(c=='t'){map.put(key,true);i+=4;}else if(c=='f'){map.put(key,false);i+=5;}else if(c=='n'){map.put(key,null);i+=4;}else{int ne=i;while(ne<len&&",}]".indexOf(raw.charAt(ne))<0)ne++;String ns=raw.substring(i,ne).trim();try{map.put(key,Integer.parseInt(ns));}catch(NumberFormatException ex2){try{map.put(key,Long.parseLong(ns));}catch(NumberFormatException ex3){try{map.put(key,Double.parseDouble(ns));}catch(NumberFormatException ex4){map.put(key,ns);}}}i=ne;}}return map;}
+    static List<Object> parseArr(String raw){List<Object>list=new ArrayList<>();raw=raw.trim();if(!raw.startsWith("["))return list;raw=raw.substring(1,raw.length()-1).trim();if(raw.isEmpty())return list;int i=0,len=raw.length();while(i<len){while(i<len&&" ,\t\n\r".indexOf(raw.charAt(i))>=0)i++;if(i>=len)break;char c=raw.charAt(i);if(c=='"'){int vs=i+1,ve=vs;while(ve<len){if(raw.charAt(ve)=='\\'){ ve+=2;continue;}if(raw.charAt(ve)=='"')break;ve++;}list.add(unesc(raw.substring(vs,ve)));i=ve+1;}else if(c=='['){int e=mc(raw,i,'[',']');list.add(parseArr(raw.substring(i,e+1)));i=e+1;}else if(c=='{'){int e=mc(raw,i,'{','}');list.add(parseObj(raw.substring(i,e+1)));i=e+1;}else{int ne=i;while(ne<len&&",]".indexOf(raw.charAt(ne))<0)ne++;String ns=raw.substring(i,ne).trim();if(ns.equals("true"))list.add(true);else if(ns.equals("false"))list.add(false);else if(ns.equals("null"))list.add(null);else try{list.add(Integer.parseInt(ns));}catch(NumberFormatException e){try{list.add(Long.parseLong(ns));}catch(NumberFormatException e2){list.add(ns);}}i=ne;}}return list;}
     static int mc(String s,int start,char open,char close){int d=0;boolean inStr=false;for(int i=start;i<s.length();i++){char c=s.charAt(i);if(!inStr){if(c==open)d++;else if(c==close){if(--d==0)return i;}else if(c=='"')inStr=true;}else{if(c=='\\')i++;else if(c=='"')inStr=false;}}return s.length()-1;}
-    static List<String> topObjects(String s){List<String> list=new ArrayList<>();int i=0,d=0,start=-1;boolean inStr=false;while(i<s.length()){char c=s.charAt(i);if(!inStr){if(c=='{'){if(d++==0)start=i;}else if(c=='}'){if(--d==0&&start>=0){list.add(s.substring(start,i+1));start=-1;}}else if(c=='"')inStr=true;}else{if(c=='\\')i++;else if(c=='"')inStr=false;}i++;}return list;}
-
-    // ── UTILS ────────────────────────────────────────────
+    static List<String> topObjs(String s){List<String>list=new ArrayList<>();int i=0,d=0,start=-1;boolean inStr=false;while(i<s.length()){char c=s.charAt(i);if(!inStr){if(c=='{'){if(d++==0)start=i;}else if(c=='}'){if(--d==0&&start>=0){list.add(s.substring(start,i+1));start=-1;}}else if(c=='"')inStr=true;}else{if(c=='\\')i++;else if(c=='"')inStr=false;}i++;}return list;}
     static String strVal(String json,String key){String n="\""+key+"\":\"";int s=json.indexOf(n);if(s<0)return"";s+=n.length();int e=s;while(e<json.length()){if(json.charAt(e)=='\\'){ e+=2;continue;}if(json.charAt(e)=='"')break;e++;}return json.substring(s,e);}
-    static String s(Map<String,Object> m,String k){Object v=m.get(k);return v==null?"":String.valueOf(v);}
-    static int toInt(Object o){if(o==null)return -1;if(o instanceof Number)return((Number)o).intValue();try{return Integer.parseInt(String.valueOf(o).trim());}catch(Exception e){return -1;}}
+    static String s(Map<String,Object>m,String k){Object v=m.get(k);return v==null?"":String.valueOf(v);}
+    static int toInt(Object o){if(o==null)return 0;if(o instanceof Number)return((Number)o).intValue();try{return Integer.parseInt(String.valueOf(o).trim());}catch(Exception e){return 0;}}
+    static long toLong(Object o){if(o==null)return 0;if(o instanceof Number)return((Number)o).longValue();try{return Long.parseLong(String.valueOf(o).trim());}catch(Exception e){return 0;}}
     static String jesc(String s){if(s==null)return"";return s.replace("\\","\\\\").replace("\"","\\\"").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t");}
     static String unesc(String s){if(!s.contains("\\"))return s;StringBuilder sb=new StringBuilder();for(int i=0;i<s.length();i++){char c=s.charAt(i);if(c=='\\'&&i+1<s.length()){char n=s.charAt(++i);if(n=='n')sb.append('\n');else if(n=='r')sb.append('\r');else if(n=='t')sb.append('\t');else sb.append(n);}else sb.append(c);}return sb.toString();}
-    static void write(String path,String content) throws IOException{Files.writeString(Path.of(path),content,StandardCharsets.UTF_8);}
-    static int indexOf(byte[] d,byte[] p){outer:for(int i=0;i<=d.length-p.length;i++){for(int j=0;j<p.length;j++)if(d[i+j]!=p[j])continue outer;return i;}return -1;}
-    static int lastIndexOf(byte[] d,byte[] p){outer:for(int i=d.length-p.length;i>=0;i--){for(int j=0;j<p.length;j++)if(d[i+j]!=p[j])continue outer;return i;}return -1;}
+    static void write(String path,String content)throws IOException{Files.writeString(Path.of(path),content,StandardCharsets.UTF_8);}
+    static int indexOf(byte[]d,byte[]p){outer:for(int i=0;i<=d.length-p.length;i++){for(int j=0;j<p.length;j++)if(d[i+j]!=p[j])continue outer;return i;}return -1;}
+    static int lastIndexOf(byte[]d,byte[]p){outer:for(int i=d.length-p.length;i>=0;i--){for(int j=0;j<p.length;j++)if(d[i+j]!=p[j])continue outer;return i;}return -1;}
 }
