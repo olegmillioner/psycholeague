@@ -432,176 +432,6 @@ main{padding-top:56px}
 @keyframes tin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 .ft{padding:18px 36px;border-top:1px solid var(--cb);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px;font-family:var(--fm);font-size:.52rem;color:var(--mt)}
 .ft .r{color:var(--red)}.ft .b{color:var(--blu)}
-
-/* ── RESPONSIVE FIXES ── */
-@media(max-width:420px){
-  .logo{font-size:1.1rem!important;letter-spacing:.08em}
-  .tbr{gap:5px}
-  .pts-badge{font-size:.55rem;padding:4px 7px}
-  .ht{font-size:clamp(2.8rem,12vw,5rem)!important}
-  .lc{padding:16px}
-  .sv.big{font-size:2rem!important}
-  .sv{font-size:1rem}
-  .sl{font-size:.6rem}
-  .lname{font-size:.7rem}
-  .si{padding:36px 14px 48px}
-  .ncb{padding:14px}
-  .nct{font-size:.85rem}
-  .profile-stats{grid-template-columns:1fr 1fr}
-  .profile-nick{font-size:1.1rem}
-  .msg-layout{grid-template-columns:1fr}
-}
-@media(max-width:360px){
-  .logo{font-size:.95rem!important}
-  .tbr{margin-right:38px}
-  .pts-badge .pts-lbl{display:none}
-  .ht{font-size:clamp(2.4rem,11vw,4rem)!important}
-}
-@media(min-width:421px) and (max-width:600px){
-  .logo{font-size:1rem!important}
-  .ht{font-size:clamp(2.6rem,9vw,4.5rem)!important}
-}
-
-/* ── BIGGER TOP LOGO ── */
-.logo{font-size:1.15rem!important;letter-spacing:.12em}
-@media(min-width:601px){.logo{font-size:1.3rem!important;letter-spacing:.18em}}
-
-/* ── BIGGER HERO TEXT ── */
-.ht .r,.ht .b{text-shadow:0 0 22px var(--rg),0 0 60px var(--rg)}
-.hs{font-size:.72rem!important;letter-spacing:.2em}
-
-/* ── LIVE STREAMS ── */
-#streams{background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(255,0,68,.06),transparent)}
-.stream-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-@media(max-width:600px){.stream-grid{grid-template-columns:1fr}}
-.stream-card{background:var(--cr);border:1px solid var(--cb);overflow:hidden;transition:border-color .25s,transform .25s;position:relative}
-.stream-card:hover{border-color:var(--red);transform:translateY(-3px)}
-.stream-card::before{content:'';display:block;height:3px;background:linear-gradient(90deg,var(--red),var(--pur))}
-.stream-live-badge{position:absolute;top:12px;left:12px;z-index:2;background:var(--red);color:#fff;font-family:var(--fm);font-size:.5rem;padding:3px 8px;display:flex;align-items:center;gap:5px;letter-spacing:.1em}
-.stream-live-dot{width:6px;height:6px;background:#fff;border-radius:50%;animation:pls 1.3s ease-in-out infinite}
-.stream-embed{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000}
-.stream-embed iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
-.stream-embed-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#070710}
-.stream-placeholder-ico{font-size:2.5rem}
-.stream-placeholder-txt{font-family:var(--fm);font-size:.6rem;color:var(--mt);letter-spacing:.1em}
-.stream-info{padding:14px 16px}
-.stream-title{font-family:var(--fh);font-size:.78rem;letter-spacing:.07em;margin-bottom:4px}
-.stream-meta{font-family:var(--fm);font-size:.52rem;color:var(--mt);display:flex;gap:14px}
-.stream-viewers{color:var(--red)}
-.stream-empty{text-align:center;padding:60px 20px;font-family:var(--fm);font-size:.7rem;color:var(--mt)}
-.stream-add-hint{background:rgba(255,0,68,.06);border:1px dashed rgba(255,0,68,.2);padding:16px;text-align:center;font-family:var(--fm);font-size:.6rem;color:var(--mt);margin-top:20px;cursor:pointer;transition:border-color .2s}
-.stream-add-hint:hover{border-color:var(--red);color:var(--txt)}
-/* Admin stream form */
-.as-stream-form .fi input{background:#030308;border:1px solid var(--cb);color:var(--txt);font-family:var(--fb);font-size:.88rem;padding:7px 11px;outline:none;width:100%;transition:border-color .18s}
-.as-stream-form .fi input:focus{border-color:var(--red)}
-
-/* ── ADAPTIVE FIXES ── */
-html{font-size:16px}
-@media(max-width:390px){html{font-size:14px}}
-@media(max-width:320px){html{font-size:13px}}
-.logo{font-size:clamp(.75rem,3.5vw,1rem)!important}
-.ni{font-size:clamp(.65rem,.9rem,.75rem)!important}
-.ht{font-size:clamp(2rem,10vw,5.5rem)!important}
-.st{font-size:clamp(1.6rem,5vw,2.8rem)!important}
-.hs{font-size:clamp(.6rem,2vw,.75rem)!important}
-.lname{font-size:clamp(.7rem,2.5vw,.85rem)!important}
-.sv.big{font-size:clamp(1.4rem,5vw,2rem)!important}
-.sv{font-size:clamp(1rem,3.5vw,1.25rem)!important}
-.nct{font-size:clamp(.85rem,2.5vw,1rem)!important}
-.nccat{font-size:clamp(.55rem,1.8vw,.62rem)!important}
-.nctxt{font-size:clamp(.82rem,2.5vw,.95rem)!important}
-.adtit{font-size:clamp(.9rem,3vw,1.1rem)!important}
-/* bigger topbar text */
-.pts-badge{font-size:clamp(.52rem,1.8vw,.62rem)!important;padding:4px 10px!important}
-.tbtn{font-size:clamp(.52rem,1.8vw,.62rem)!important}
-.user-chip{font-size:clamp(.52rem,1.8vw,.62rem)!important}
-/* Logo bigger */
-.logo{font-size:clamp(.92rem,3.8vw,1.05rem)!important;letter-spacing:.12em!important}
-/* Better grid on small screens */
-@media(max-width:480px){
-  .lgrid{grid-template-columns:1fr!important;gap:12px!important}
-  .sgrid,.sg{grid-template-columns:1fr 1fr!important}
-  .profile-stats{grid-template-columns:1fr 1fr 1fr!important}
-  .shop-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
-  .pgrid{grid-template-columns:1fr 1fr!important;gap:10px!important}
-  .ngrid{grid-template-columns:1fr!important}
-  .tour-grid{grid-template-columns:1fr!important}
-  .quiz-answers{grid-template-columns:1fr!important}
-  .af{padding:14px!important}
-  .adcon{padding:10px!important}
-  .msg-layout{grid-template-columns:1fr!important}
-}
-@media(max-width:360px){
-  .shop-grid{grid-template-columns:1fr!important}
-  .pgrid{grid-template-columns:1fr!important}
-  .profile-stats{grid-template-columns:1fr 1fr!important}
-  .tbr{gap:4px!important}
-}
-/* Fix topbar overflow */
-@media(max-width:400px){
-  .live{display:none!important}
-  .logo-v{display:none!important}
-}
-
-/* ── AI CHATBOT ── */
-#aichat{background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(170,68,255,.06),transparent);align-items:center;padding:0;padding-top:56px}
-.chat-layout{display:flex;flex-direction:column;height:calc(100vh - 56px);max-width:780px;width:100%;margin:0 auto}
-.chat-header{padding:14px 20px;border-bottom:1px solid var(--cb);background:var(--s1);display:flex;align-items:center;gap:12px;flex-shrink:0}
-.chat-header-ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--blu));display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;box-shadow:0 0 14px rgba(170,68,255,.4)}
-.chat-header-info{flex:1}
-.chat-header-name{font-family:var(--fh);font-size:.78rem;letter-spacing:.08em;color:var(--txt)}
-.chat-header-status{font-family:var(--fm);font-size:.5rem;color:var(--grn);margin-top:2px}
-.chat-modes{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
-.chat-mode-btn{font-family:var(--fm);font-size:.5rem;padding:4px 10px;border:1px solid var(--cb);background:transparent;color:var(--mt2);cursor:pointer;transition:all .18s;border-radius:20px}
-.chat-mode-btn.on{border-color:var(--pur);color:var(--pur);background:rgba(170,68,255,.1)}
-.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-.chat-msg{display:flex;gap:10px;align-items:flex-start}
-.chat-msg.user{flex-direction:row-reverse}
-.chat-msg-ava{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
-.chat-msg-ava.ai{background:linear-gradient(135deg,var(--pur),var(--blu))}
-.chat-msg-ava.user-ava{background:var(--cr);border:1px solid var(--cb)}
-.chat-bubble{max-width:75%;padding:12px 16px;border-radius:2px;font-size:.88rem;line-height:1.6}
-.chat-bubble.ai{background:rgba(170,68,255,.08);border:1px solid rgba(170,68,255,.2);color:var(--txt)}
-.chat-bubble.user{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--txt);align-self:flex-end}
-.chat-bubble strong{color:var(--pur)}
-.chat-bubble .ai-rating{display:inline-flex;align-items:center;gap:4px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.2);padding:2px 8px;border-radius:10px;font-size:.75rem;color:var(--grn);margin:2px 2px}
-.chat-bubble .ai-bad{background:rgba(255,0,68,.1);border-color:rgba(255,0,68,.2);color:var(--red)}
-.chat-typing{display:flex;gap:4px;align-items:center;padding:8px 0}
-.chat-typing span{width:7px;height:7px;background:var(--pur);border-radius:50%;animation:typingDot 1.2s ease-in-out infinite}
-.chat-typing span:nth-child(2){animation-delay:.2s}
-.chat-typing span:nth-child(3){animation-delay:.4s}
-@keyframes typingDot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-5px);opacity:1}}
-.chat-input-area{padding:12px 16px;border-top:1px solid var(--cb);background:var(--s1);flex-shrink:0}
-.chat-quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.chat-quick{font-family:var(--fm);font-size:.5rem;padding:5px 10px;border:1px solid rgba(170,68,255,.3);background:rgba(170,68,255,.06);color:var(--pur);cursor:pointer;border-radius:14px;transition:all .18s;white-space:nowrap}
-.chat-quick:hover{background:rgba(170,68,255,.2)}
-.chat-input-row{display:flex;gap:10px}
-.chat-input-row input{flex:1;background:var(--cr);border:1px solid var(--cb);color:var(--txt);font-family:var(--fb);font-size:.9rem;padding:10px 14px;outline:none;transition:border-color .18s;border-radius:2px}
-.chat-input-row input:focus{border-color:var(--pur)}
-.chat-send-btn{font-family:var(--fh);font-size:.6rem;letter-spacing:.09em;padding:10px 18px;background:var(--pur);border:none;color:#fff;cursor:pointer;transition:all .18s;font-weight:700}
-.chat-send-btn:hover{box-shadow:0 0 14px var(--pur)}
-.chat-send-btn:disabled{opacity:.5;cursor:default}
-
-/* ── MARIO ── */
-#gp-mario{display:none;width:100%;max-width:600px;flex-direction:column;align-items:center}
-#gp-mario.on{display:flex}
-#mario-canvas{border:1px solid var(--red);display:block;background:#1a0a2e;width:100%}
-.mario-bar{width:100%;padding:8px 14px;background:var(--s1);border:1px solid var(--red);border-bottom:none;font-family:var(--fm);font-size:.6rem;color:var(--red);display:flex;justify-content:space-between;align-items:center}
-.mario-foot{width:100%;padding:8px 14px;background:var(--s1);border:1px solid var(--red);border-top:none;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.mario-btn{font-family:var(--fm);font-size:.6rem;color:var(--red);background:transparent;border:1px solid var(--red);padding:5px 14px;cursor:pointer;transition:all .18s}
-.mario-btn:hover{background:var(--red);color:#000}
-/* Mobile mario controls */
-.mario-dpad{display:none;justify-content:center;gap:8px;margin-top:10px;flex-wrap:wrap}
-@media(max-width:600px){.mario-dpad{display:flex}}
-.mario-dpad-btn{width:52px;height:52px;background:rgba(255,0,68,.12);border:1px solid rgba(255,0,68,.3);color:var(--red);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;user-select:none;-webkit-user-select:none}
-.mario-dpad-btn:active{background:rgba(255,0,68,.35)}
-
-/* ── VIDEO IN FEED ── */
-.post-video{width:100%;margin-bottom:10px;border-radius:2px;overflow:hidden}
-.post-video video{width:100%;max-height:360px;display:block;background:#000}
-.post-media-btn.video-btn{border-color:rgba(255,0,68,.3);color:var(--red)}
-.post-media-btn.video-btn:hover{border-color:var(--red);color:var(--red)}
-
 </style>
 </head>
 <body>
@@ -622,7 +452,6 @@ html{font-size:16px}
   <a class="ni on" data-s="home"        onclick="go('home');return false"        href="#"><span class="dot"></span>⚽ Главная</a>
   <a class="ni"    data-s="news"        onclick="go('news');return false"        href="#"><span class="dot"></span>📰 Новости</a>
   <a class="ni"    data-s="feed"        onclick="go('feed');return false"        href="#"><span class="dot"></span>📸 Лента</a>
-  <a class="ni"    data-s="streams"     onclick="go('streams');return false"     href="#"><span class="dot"></span>📡 Трансляции<span class="badge" id="live-badge" style="display:none">LIVE</span></a>
   <a class="ni"    data-s="messages"    onclick="go('messages');return false"    href="#" id="sb-messages" style="display:none"><span class="dot"></span>💬 Сообщения<span class="badge" id="msg-badge" style="display:none">0</span></a>
   <a class="ni"    data-s="results"     onclick="go('results');return false"     href="#"><span class="dot"></span>📊 Результаты</a>
   <a class="ni"    data-s="tournaments" onclick="go('tournaments');return false" href="#"><span class="dot"></span>🏆 Турниры</a>
@@ -631,7 +460,6 @@ html{font-size:16px}
   <a class="ni"    data-s="game"        onclick="go('game');return false"        href="#"><span class="dot"></span>🎮 Игры</a>
   <a class="ni"    data-s="quiz"        onclick="go('quiz');return false"        href="#"><span class="dot"></span>🧠 Квиз</a>
   <a class="ni"    data-s="shop"        onclick="go('shop');return false"        href="#"><span class="dot"></span>🛒 Магазин</a>
-  <a class="ni"    data-s="aichat"      onclick="go('aichat');return false"      href="#"><span class="dot"></span>🤖 ИИ-Советник</a>
   <a class="ni"    data-s="apply"       onclick="go('apply');return false"       href="#"><span class="dot"></span>📋 Заявка</a>
   <a class="ni"    data-s="profile"     onclick="go('profile');return false"     href="#" id="sb-profile" style="display:none"><span class="dot"></span>👤 Профиль</a>
   <a class="ni ni-o" id="sb-login"      onclick="openAuth();closeMenu();return false" href="#"><span class="dot"></span>🔑 Войти</a>
@@ -675,10 +503,8 @@ html{font-size:16px}
     <div class="post-composer" id="post-composer" style="display:none">
       <textarea id="post-text" placeholder="Поделись чем-нибудь с лигой..."></textarea>
       <img id="post-img-prev" class="post-preview-img" src="" alt="">
-      <div id="post-vid-prev" class="post-video" style="display:none"><video controls><source id="post-vid-src" src=""></video></div>
       <div class="post-composer-actions">
         <div class="post-media-btn">📷 Фото<input type="file" id="post-img-file" accept="image/*" onchange="handlePostImg(this)"></div>
-        <div class="post-media-btn video-btn">🎥 Видео<input type="file" id="post-vid-file" accept="video/*" onchange="handlePostVid(this)"></div>
         <button class="post-submit" onclick="submitPost()">ОПУБЛИКОВАТЬ</button>
       </div>
     </div>
@@ -686,21 +512,6 @@ html{font-size:16px}
     <div id="feed-list"><div class="nempty">Загрузка<span class="blink">_</span></div></div>
   </div>
 </section>
-
-<section id="streams" class="sec">
-  <div class="si">
-    <h2 class="st"><span class="r">ТРА</span>НСЛ<span class="b">ЯЦИИ</span></h2>
-    <p class="ss">// ПРЯМЫЕ ЭФИРЫ МАТЧЕЙ · YOUTUBE · TWITCH</p>
-    <div class="sdiv"></div>
-    <div class="stream-grid" id="stream-grid">
-      <div class="stream-empty">Загрузка<span class="blink">_</span></div>
-    </div>
-    <div class="stream-add-hint" id="stream-add-hint" style="display:none" onclick="openAdmin()">
-      + Добавить трансляцию (только для администраторов)
-    </div>
-  </div>
-</section>
-
 <section id="messages" class="sec">
   <div class="msg-layout">
     <div class="msg-sidebar">
@@ -752,7 +563,7 @@ html{font-size:16px}
 <section id="game" class="sec">
   <div class="game-hub-title">🎮 ИГ<span style="color:var(--red)">РЫ</span></div>
   <div class="game-hub-sub">// ARCADE · ВЫБЕРИ СЛОЖНОСТЬ</div>
-  <div class="game-tabs"><button class="gtab on" onclick="switchGame('pong',this)">🏓 ПИНГ-ПОНГ</button><button class="gtab" onclick="switchGame('race',this)">🏎️ ГОНКИ</button><button class="gtab" onclick="switchGame('football',this)">⚽ ПЕНАЛЬТИ</button><button class="gtab" onclick="switchGame('mario',this)">🍄 МАРИО</button><button class="gtab" onclick="switchGame('tetris',this)">🟦 ТЕТРИС</button><button class="gtab" onclick="switchGame('snake',this)">🐍 ЗМЕЙКА</button></div>
+  <div class="game-tabs"><button class="gtab on" onclick="switchGame('pong',this)">🏓 ПИНГ-ПОНГ</button><button class="gtab" onclick="switchGame('race',this)">🏎️ ГОНКИ</button><button class="gtab" onclick="switchGame('football',this)">⚽ ПЕНАЛЬТИ</button><button class="gtab" onclick="switchGame('tetris',this)">🟦 ТЕТРИС</button><button class="gtab" onclick="switchGame('snake',this)">🐍 ЗМЕЙКА</button></div>
   <div class="game-pane on" id="gp-pong">
     <div class="diff-bar"><span class="diff-lbl">СЛОЖНОСТЬ:</span><button class="diff-btn on" onclick="setPongDiff('easy',this)">ЛЁГКИЙ</button><button class="diff-btn" onclick="setPongDiff('medium',this)">СРЕДНИЙ</button><button class="diff-btn" onclick="setPongDiff('hard',this)">СЛОЖНЫЙ</button><button class="diff-btn" onclick="setPongDiff('insane',this)">INSANE</button></div>
     <div class="gsc"><div class="gss"><div class="gsv rc" id="scpu">0</div><div style="font-family:var(--fm);font-size:.56rem;color:var(--mt)">CPU ↑</div></div><div class="gsp">:</div><div class="gss"><div class="gsv bc" id="sply">0</div><div style="font-family:var(--fm);font-size:.56rem;color:var(--mt)">↓ ВЫ</div></div></div>
@@ -763,61 +574,6 @@ html{font-size:16px}
   </div>
   <div class="game-pane" id="gp-football">
     <div style="width:100%;max-width:580px"><div class="diff-bar"><span class="diff-lbl">ВРАТАРЬ:</span><button class="diff-btn on" onclick="setFootDiff('easy',this)">СЛАБЫЙ</button><button class="diff-btn" onclick="setFootDiff('medium',this)">СРЕДНИЙ</button><button class="diff-btn" onclick="setFootDiff('hard',this)">ТОПОВЫЙ</button></div><div class="foot-bar"><span id="foot-status">Кликни по воротам</span><span id="foot-score">⚽ 0 : 0 🥅</span></div><canvas id="foot-canvas" width="540" height="360"></canvas><div class="foot-foot"><button class="fbtn" onclick="footReset()">↺ НОВАЯ ИГРА</button><span style="font-family:var(--fm);font-size:.54rem;color:var(--mt);margin-left:auto">Кликни выше половины</span></div></div>
-  </div>
-
-
-  <!-- MARIO PLATFORMER -->
-  <div class="game-pane" id="gp-mario">
-    <div style="width:100%;max-width:500px">
-      <div class="diff-bar">
-        <span class="diff-lbl">СЛОЖНОСТЬ:</span>
-        <button class="diff-btn on" onclick="setMarioDiff(1,this)">ЛЁГКИЙ</button>
-        <button class="diff-btn" onclick="setMarioDiff(2,this)">СРЕДНИЙ</button>
-        <button class="diff-btn" onclick="setMarioDiff(3,this)">СЛОЖНЫЙ</button>
-      </div>
-      <div style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--s1);border:1px solid #e52521;border-bottom:none;font-family:var(--fm);font-size:.6rem;color:#e52521">
-        <span id="mario-status">Нажмите СТАРТ</span>
-        <span id="mario-score">🍄 0 · ❤️ 3</span>
-      </div>
-      <canvas id="mario-canvas" width="500" height="320" style="border:1px solid #e52521;display:block;background:#5c94fc;width:100%"></canvas>
-      <div style="width:100%;padding:8px 14px;background:var(--s1);border:1px solid #e52521;border-top:none;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-        <button style="font-family:var(--fm);font-size:.6rem;color:#e52521;background:transparent;border:1px solid #e52521;padding:5px 14px;cursor:pointer" id="mario-start-btn" onclick="marioStart()">▶ СТАРТ</button>
-        <button style="font-family:var(--fm);font-size:.6rem;color:#e52521;background:transparent;border:1px solid #e52521;padding:5px 14px;cursor:pointer" onclick="marioReset()">↺ СБРОС</button>
-        <span style="font-family:var(--fm);font-size:.54rem;color:var(--mt);margin-left:auto">← → прыжок ↑ / тап</span>
-      </div>
-      <!-- Mobile controls -->
-      <div style="display:flex;gap:8px;padding:10px 14px;background:rgba(0,0,0,.3);border:1px solid rgba(229,37,33,.3);border-top:none;justify-content:space-between">
-        <div style="display:flex;gap:8px">
-          <button style="font-family:var(--fm);font-size:1.2rem;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:10px 18px;cursor:pointer;border-radius:6px;user-select:none" ontouchstart="marioKeys.left=true" ontouchend="marioKeys.left=false" onmousedown="marioKeys.left=true" onmouseup="marioKeys.left=false">◀</button>
-          <button style="font-family:var(--fm);font-size:1.2rem;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:10px 18px;cursor:pointer;border-radius:6px;user-select:none" ontouchstart="marioKeys.right=true" ontouchend="marioKeys.right=false" onmousedown="marioKeys.right=true" onmouseup="marioKeys.right=false">▶</button>
-        </div>
-        <button style="font-family:var(--fm);font-size:1rem;color:#fff;background:rgba(229,37,33,.3);border:1px solid rgba(229,37,33,.5);padding:10px 28px;cursor:pointer;border-radius:6px;font-weight:700;user-select:none" ontouchstart="marioJump()" onmousedown="marioJump()">JUMP</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MARIO -->
-  <div class="game-pane" id="gp-mario">
-    <div style="width:100%;max-width:560px">
-      <div class="diff-bar">
-        <span class="diff-lbl">УРОВЕНЬ:</span>
-        <button class="diff-btn on" onclick="setMarioDiff(1,this)">НОВИЧОК</button>
-        <button class="diff-btn" onclick="setMarioDiff(2,this)">НОРМАЛЬНЫЙ</button>
-        <button class="diff-btn" onclick="setMarioDiff(3,this)">ХАРДКОР</button>
-      </div>
-      <div class="mario-bar"><span id="mario-status">Нажмите СТАРТ</span><span id="mario-score">⭐ 0 &nbsp; 💀 3 &nbsp; ⏱️ 0</span></div>
-      <canvas id="mario-canvas" width="560" height="320"></canvas>
-      <div class="mario-foot">
-        <button class="mario-btn" id="mario-start-btn" onclick="marioStart()">▶ СТАРТ</button>
-        <button class="mario-btn" onclick="marioReset()">↺ СБРОС</button>
-        <span style="font-family:var(--fm);font-size:.54rem;color:var(--mt);margin-left:auto">← → прыжок=↑/Пробел</span>
-      </div>
-      <div class="mario-dpad">
-        <button class="mario-dpad-btn" id="m-left" ontouchstart="mKeys.left=true" ontouchend="mKeys.left=false">◀</button>
-        <button class="mario-dpad-btn" id="m-jump" ontouchstart="marioJump()" ontouchend="">↑</button>
-        <button class="mario-dpad-btn" id="m-right" ontouchstart="mKeys.right=true" ontouchend="mKeys.right=false">▶</button>
-      </div>
-    </div>
   </div>
 
   <!-- TETRIS -->
@@ -889,39 +645,6 @@ html{font-size:16px}
     <div id="purchases-wrap" style="display:none"><div style="font-family:var(--fh);font-size:.75rem;letter-spacing:.12em;color:var(--gld);margin-bottom:14px">🛒 ИСТОРИЯ ПОКУПОК</div><div class="purchase-list" id="purchase-list"></div></div>
   </div>
 </section>
-
-<section id="aichat" class="sec">
-  <div class="chat-layout">
-    <div class="chat-header">
-      <div class="chat-header-ava">🤖</div>
-      <div class="chat-header-info">
-        <div class="chat-header-name">PSYCHO AI 🔥 Без фильтров</div>
-        <div class="chat-header-status">● Онлайн · Говорит как есть</div>
-      </div>
-      <div class="chat-modes">
-        <button class="chat-mode-btn on" onclick="setChatMode('squad',this)">⚽ Состав</button>
-        <button class="chat-mode-btn" onclick="setChatMode('general',this)">💬 Общение</button>
-        <button class="chat-mode-btn" onclick="setChatMode('meta',this)">📊 Мета</button>
-      </div>
-    </div>
-    <div class="chat-messages" id="chat-messages">
-      <!-- Welcome message will be inserted by JS -->
-    </div>
-    <div class="chat-input-area">
-      <div class="chat-quick-btns" id="chat-quick-btns">
-        <button class="chat-quick" onclick="sendQuick('Какая лучшая схема сейчас?')">🔥 Лучшая схема?</button>
-        <button class="chat-quick" onclick="sendQuick('Оцени мой состав с ОБЩ 122')">⭐ Оцени состав</button>
-        <button class="chat-quick" onclick="sendQuick('Кто лучший вратарь в EA FC Mobile?')">🥅 Лучший вратарь?</button>
-        <button class="chat-quick" onclick="sendQuick('Как улучшить атаку?')">⚡ Улучшить атаку</button>
-        <button class="chat-quick" onclick="sendQuick('Как выиграть VS Атаку?')">🏆 VS Атака</button>
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="chat-input" placeholder="Спроси про состав, игроков, тактику..." onkeydown="if(event.key==='Enter')sendChatMsg()">
-        <button class="chat-send-btn" id="chat-send" onclick="sendChatMsg()">↗ СПРОСИТЬ</button>
-      </div>
-    </div>
-  </div>
-</section>
 <section id="apply" class="sec"><div class="si"><h2 class="st">ЗА<span style="color:var(--grn)">ЯВ</span>КА</h2><p class="ss">// ВСТУПЛЕНИЕ В ЛИГУ</p><div class="sdiv g"></div><div id="app-wrap"><form class="rf" onsubmit="doApply(event)"><div class="fi"><label>Ник в игре *</label><input type="text" id="ap-name" placeholder="Твой ник" required></div><div class="fi"><label>ОБЩ команды *</label><input type="number" id="ap-obr" placeholder="120" min="1" max="999" required></div><div class="fi"><label>Основной клуб</label><input type="text" id="ap-club" placeholder="Real Madrid"></div><div class="fi"><label>Схема</label><input type="text" id="ap-form" placeholder="4-3-3"></div><div class="fi"><label>В какую лигу?</label><select id="ap-league"><option value="PL1">Psycho League (PL1)</option><option value="PL2">Psycho League 2 (PL2)</option></select></div><div class="fi"><label>Telegram / контакт</label><input type="text" id="ap-contact" placeholder="@username"></div><div class="fi"><label>О себе</label><textarea id="ap-about" placeholder="Расскажи о себе..." style="min-height:60px;resize:vertical"></textarea></div><button type="submit" class="gbtn-g">ОТПРАВИТЬ ЗАЯВКУ</button></form><div class="app-info"><strong>Как это работает:</strong><br>📋 Заполни форму<br>👀 Администратор рассмотрит в течение 24 часов<br>✅ При принятии получишь уведомление</div></div><div class="app-succ" id="app-succ"><div style="font-size:2rem;margin-bottom:10px">📋</div><p style="color:var(--grn)">Заявка отправлена!</p></div></div></section>
 <section id="register" class="sec"><div class="si"><h2 class="st">ПОД<span class="b">ПИСЬ</span>КА</h2><p class="ss">// PUSH-УВЕДОМЛЕНИЯ О НОВОСТЯХ</p><div class="sdiv b"></div><div id="rfwrap"><form class="rf" style="max-width:460px" onsubmit="doReg(event)"><div class="fi"><label>Ник / Имя *</label><input type="text" id="rname" placeholder="Твой ник" required></div><div class="fi"><label>Email (необязательно)</label><input type="email" id="remail" placeholder="email@example.com"></div><button type="submit" style="font-family:var(--fh);font-size:.65rem;letter-spacing:.11em;padding:11px 26px;background:linear-gradient(90deg,var(--red),var(--red2));border:none;color:#fff;cursor:pointer;margin-top:6px;text-transform:uppercase">ПОДПИСАТЬСЯ</button></form><div class="rinfo"><strong>Что получишь:</strong><br>🔔 Push-уведомления о новостях<br>📊 Уведомления о результатах турниров</div></div><div class="rsucc" id="rsucc"><div style="font-size:2rem;margin-bottom:10px">✅</div><p style="color:var(--blu)">Подписка оформлена!</p></div></div></section>
 <div class="ft"><span>PSYCHO <span class="r">LEAGUE</span> &copy; 2025–2026</span><span>EA FC MOBILE · EUW</span><span>Java · <span class="b">v7.0</span></span></div>
@@ -943,7 +666,6 @@ html{font-size:16px}
         <a class="an" onclick="aTab('as-shop',this)">🛒 Магазин</a>
         <a class="an" onclick="aTab('as-texts',this)">✏️ Тексты</a>
         <a class="an" onclick="aTab('as-tours',this)">🏆 Турниры</a>
-        <a class="an" onclick="aTab('as-streams',this)">📡 Трансляции</a>
         <a class="an" onclick="aTab('as-posts',this)">📸 Публикации</a>
         <a class="an" onclick="aTab('as-usr',this)">👤 Пользователи</a>
         <a class="an owner-only" id="an-owner-admins" style="display:none" onclick="aTab('as-owner-admins',this)">👑 Управление Админами</a>
@@ -959,23 +681,6 @@ html{font-size:16px}
         <div class="adsec" id="as-shop"><div class="adtit">МАГАЗИН</div><div class="adsub">// УПРАВЛЕНИЕ ПРЕДМЕТАМИ</div><div class="af"><h3>+ Добавить предмет</h3><div class="afrow"><div class="fi"><label>Название</label><input type="text" id="si-name" placeholder="Временный Админ"></div><div class="fi"><label>Иконка</label><input type="text" id="si-ico" placeholder="👑" maxlength="4"></div></div><div class="fi"><label>Описание</label><input type="text" id="si-desc" placeholder="Доступ к панели на 24 часа"></div><div class="afrow"><div class="fi"><label>Цена (очки)</label><input type="number" id="si-price" value="100" min="1"></div><div class="fi"><label>Тип</label><select id="si-type"><option value="admin_temp">Временный Админ</option><option value="vip">VIP статус</option><option value="card">Кастомная карточка</option><option value="other">Другое</option></select></div></div><button class="afbtn gld" onclick="postShopItem()">ДОБАВИТЬ</button></div><div class="alist" id="shopalist"></div></div>
         <div class="adsec" id="as-texts"><div class="adtit">ТЕКСТЫ САЙТА</div><div class="adsub">// РЕДАКТИРОВАТЬ СТАТИСТИКУ</div><div class="af" style="max-width:700px"><h3>Статистика PL1</h3><div class="afrow"><div class="fi"><label>Участников</label><input type="number" id="te-pl1_members" placeholder="85"></div><div class="fi"><label>Голов</label><input type="number" id="te-pl1_goals" placeholder="240712"></div></div><div class="afrow"><div class="fi"><label>ОБЩ</label><input type="number" id="te-pl1_obr" placeholder="12116"></div><div class="fi"><label>Побед</label><input type="number" id="te-pl1_wins" placeholder="161"></div></div><h3>Статистика PL2</h3><div class="afrow"><div class="fi"><label>Участников</label><input type="number" id="te-pl2_members" placeholder="100"></div><div class="fi"><label>Голов</label><input type="number" id="te-pl2_goals" placeholder="98871"></div></div><div class="afrow"><div class="fi"><label>ОБЩ</label><input type="number" id="te-pl2_obr" placeholder="12061"></div><div class="fi"><label>Побед</label><input type="number" id="te-pl2_wins" placeholder="40"></div></div><div class="fi"><label>Название PL1</label><input type="text" id="te-pl1_name"></div><div class="fi"><label>Название PL2</label><input type="text" id="te-pl2_name"></div><div class="fi"><label>Подзаголовок главной</label><input type="text" id="te-hero_sub"></div><button class="afbtn" onclick="saveTexts()">💾 СОХРАНИТЬ</button></div></div>
         <div class="adsec" id="as-tours"><div class="adtit">ТУРНИРЫ</div><div class="adsub">// СОЗДАВАТЬ И УПРАВЛЯТЬ</div><div class="af"><h3>+ Создать турнир</h3><div class="fi"><label>Название</label><input type="text" id="tour-name" placeholder="Весенний кубок 2026"></div><div class="fi"><label>Формат</label><input type="text" id="tour-format" placeholder="Группа + плей-офф"></div><div class="afrow"><div class="fi"><label>Призовой фонд (очки)</label><input type="number" id="tour-prize" value="500" min="0"></div><div class="fi"><label>Макс. участников</label><input type="number" id="tour-max" value="16" min="2"></div></div><button class="afbtn gld" onclick="postTournament()">СОЗДАТЬ</button></div><div class="alist" id="tourlist"></div></div>
-
-        <div class="adsec" id="as-streams">
-          <div class="adtit">ТРАНСЛЯЦИИ</div>
-          <div class="adsub">// YOUTUBE · TWITCH · ПРЯМЫЕ ЭФИРЫ</div>
-          <div class="af as-stream-form">
-            <h3>+ Добавить трансляцию</h3>
-            <div class="fi"><label>Название матча</label><input type="text" id="str-title" placeholder="PaNdA vs Psycho · Финал"></div>
-            <div class="fi"><label>YouTube / Twitch ссылка</label><input type="text" id="str-url" placeholder="https://youtube.com/watch?v=... или https://twitch.tv/..."></div>
-            <div class="fi"><label>Описание (необязательно)</label><input type="text" id="str-desc" placeholder="Финал лиги · PL1"></div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <button class="afbtn" onclick="postStream()">📡 ДОБАВИТЬ</button>
-              <button class="afbtn" style="background:var(--grn);color:#000" onclick="postStream(true)">🔴 ДОБАВИТЬ КАК LIVE</button>
-            </div>
-          </div>
-          <div class="alist" id="stream-admin-list"></div>
-        </div>
-
         <div class="adsec" id="as-posts"><div class="adtit">ПУБЛИКАЦИИ</div><div class="adsub">// МОДЕРАЦИЯ КОНТЕНТА</div><div class="alist" id="posts-admin-list"></div></div>
         <div class="adsec" id="as-usr"><div class="adtit">ПОЛЬЗОВАТЕЛИ</div><div class="adsub">// СПИСОК ЗАРЕГИСТРИРОВАННЫХ</div><div class="alist" id="ulist"></div></div>
         <div class="adsec" id="as-owner-admins"><div class="adtit" style="color:var(--gld)">👑 УПРАВЛЕНИЕ АДМИНАМИ</div><div class="adsub">// ТОЛЬКО ДЛЯ ВЛАДЕЛЬЦА</div><div class="af"><h3 class="gld">+ Добавить администратора</h3><div class="afrow"><div class="fi"><label>Логин</label><input type="text" id="oa-login" placeholder="admin_login"></div><div class="fi"><label>Ник</label><input type="text" id="oa-nick" placeholder="Имя"></div></div><div class="fi"><label>Пароль</label><input type="password" id="oa-pass"></div><button class="afbtn gld" onclick="postAdmin()">ДОБАВИТЬ АДМИНА</button></div><div class="alist" id="admin-list"></div></div>
@@ -1111,7 +816,6 @@ function go(id){
   if(id==='quiz')loadLeaderboard();
   if(id==='shop'){loadShop();updatePtsDisplay();}
   if(id==='profile')renderProfile();
-  if(id==='aichat')initChatBot();
 }
 
 async function loadSiteTexts(){try{const r=await fetch(API+'/api/texts');if(!r.ok)return;siteTexts=await r.json();applyTexts();}catch(e){}}
@@ -1151,9 +855,7 @@ async function loadFeed(){
   }).join('');}catch(e){el.innerHTML='<div class="nempty">Ошибка загрузки</div>';}
 }
 function handlePostImg(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{postImgData=ev.target.result;const prev=document.getElementById('post-img-prev');prev.src=ev.target.result;prev.style.display='block';};reader.readAsDataURL(file);}
-let postVidData='';
-function handlePostVid(input){const file=input.files[0];if(!file)return;if(file.size>50*1024*1024){toast('Видео слишком большое (макс 50MB)',true);return;}const url=URL.createObjectURL(file);const prev=document.getElementById('post-vid-prev');const src=document.getElementById('post-vid-src');src.src=url;prev.style.display='block';const reader=new FileReader();reader.onload=ev=>{postVidData=ev.target.result;toast('✅ Видео готово!','s');};reader.readAsDataURL(file);}
-async function submitPost(){if(!tok||!curUser){openAuth();return;}const text=document.getElementById('post-text').value.trim();if(!text&&!postImgData&&!postVidData){toast('Напиши что-нибудь!',true);return;}try{const body={text};if(postImgData)body.img=postImgData;if(postVidData)body.vid=postVidData;const r=await fetch(API+'/api/posts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(body)});if(!r.ok)throw new Error();document.getElementById('post-text').value='';postImgData='';document.getElementById('post-img-prev').style.display='none';document.getElementById('post-vid-prev').style.display='none';document.getElementById('post-img-file').value='';document.getElementById('post-vid-file').value='';postImgData='';postVidData='';toast('✅ Опубликовано!','s');loadFeed();}catch(e){toast('Ошибка публикации',true);}}
+async function submitPost(){if(!tok||!curUser){openAuth();return;}const text=document.getElementById('post-text').value.trim();if(!text&&!postImgData){toast('Напиши что-нибудь!',true);return;}try{const body={text};if(postImgData)body.img=postImgData;const r=await fetch(API+'/api/posts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify(body)});if(!r.ok)throw new Error();document.getElementById('post-text').value='';postImgData='';document.getElementById('post-img-prev').style.display='none';document.getElementById('post-img-file').value='';toast('✅ Опубликовано!','s');loadFeed();}catch(e){toast('Ошибка публикации',true);}}
 async function likePost(id){if(!tok){openAuth();return;}try{await fetch(API+'/api/posts/like',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify({id})});loadFeed();}catch(e){}}
 function toggleComments(id){document.getElementById('cmts-'+id).classList.toggle('on');}
 async function sendComment(postId,input){const text=input.value.trim();if(!text||!tok)return;try{const r=await fetch(API+'/api/posts/comment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok},body:JSON.stringify({id:postId,text})});if(!r.ok)throw new Error();input.value='';loadFeed();setTimeout(()=>{const cs=document.getElementById('cmts-'+postId);if(cs)cs.classList.add('on');},200);}catch(e){toast('Ошибка',true);}}
@@ -1182,7 +884,7 @@ function openSq(src,cap){document.getElementById('sqimg').src=src;document.getEl
 function closeSq(){document.getElementById('sqm').classList.remove('on');}
 
 let gamesInited=false;
-function initGames(){if(gamesInited)return;gamesInited=true;initPong();initRace();initFootball();initMario();initTetris();initSnake();}
+function initGames(){if(gamesInited)return;gamesInited=true;initPong();initRace();initFootball();initTetris();initSnake();}
 function switchGame(id,btn){document.querySelectorAll('.gtab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('.game-pane').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById('gp-'+id).classList.add('on');}
 
 const PDIFF={easy:{cpu:2.2,ball:4},medium:{cpu:3.5,ball:5.5},hard:{cpu:5,ball:7.5},insane:{cpu:7.5,ball:11}};
@@ -1224,56 +926,8 @@ async function loadQuizQ(){
   if(!quizNick){document.getElementById('quiz-nick-form').style.display='';return;}
   document.getElementById('quiz-loading').style.display='block';document.getElementById('quiz-content').innerHTML='';
   quizState={questions:[],current:0,score:0,streak:0,answered:false,timer:null};updateQuizHUD();
-  const fallback=[
-    {q:'Кто забил больше всего голов в истории Чемпионата Мира?',a:['Криштиану Роналду','Мирослав Клозе','Пеле','Лионель Месси'],correct:1,pts:20},
-    {q:'В каком году Бразилия выиграла свой 5-й ЧМ?',a:['1994','1998','2002','2006'],correct:2,pts:10},
-    {q:'Какой европейский клуб выиграл больше всего Лиг Чемпионов?',a:['Барселона','Милан','Бавария','Реал Мадрид'],correct:3,pts:10},
-    {q:'Кто выиграл Золотой мяч в 2023 году?',a:['Килиан Мбаппе','Эрлинг Холанд','Лионель Месси','Винисиус Жуниор'],correct:2,pts:20},
-    {q:'Сколько раз Месси выигрывал Золотой мяч на 2024 год?',a:['6','7','8','9'],correct:2,pts:30},
-    {q:'Что означает аббревиатура ОБЩ в EA FC Mobile?',a:['Общий рейтинг','Общий счёт','Общий бюджет','Общее число побед'],correct:0,pts:20},
-    {q:'Какой игрок носит прозвище "Феномен"?',a:['Роналдиньо','Роналдо Назарио','Пеле','Зидан'],correct:1,pts:20},
-  ];
-  try{
-    const seed=Math.floor(Math.random()*9999);
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:2000,
-        system:`Ты эксперт по футболу и EA FC Mobile. Создаёшь викторину. Seed: ${seed}. 
-КРИТИЧЕСКИ ВАЖНО: Отвечай ТОЛЬКО валидным JSON массивом. БЕЗ markdown, БЕЗ текста до или после, БЕЗ \`\`\`.
-Каждый раз генерируй РАЗНЫЕ вопросы — меняй темы, эпохи, страны.`,
-        messages:[{role:'user',content:`Создай ровно 7 вопросов о футболе. Темы: история ЧМ, звёзды, клубы, EA FC Mobile механики, рекорды, тактика, трансферы.
-Верни ТОЛЬКО JSON (без markdown):
-[{"q":"Вопрос?","a":["Вариант1","Вариант2","Вариант3","Вариант4"],"correct":0,"pts":10,"explanation":"Краткое объяснение"}]
-pts: простой=10, средний=20, сложный=30. correct=индекс правильного ответа (0-3).`}]
-      })
-    });
-    const data=await resp.json();
-    let text=(data.content?.[0]?.text||'').trim();
-    // Strip any markdown fences
-    text=text.replace(/^```[\w]*
-?/,'').replace(/
-?```$/,'').trim();
-    // Find JSON array
-    const startIdx=text.indexOf('[');
-    const endIdx=text.lastIndexOf(']');
-    if(startIdx>=0&&endIdx>startIdx)text=text.substring(startIdx,endIdx+1);
-    const qs=JSON.parse(text);
-    if(!Array.isArray(qs)||qs.length<3)throw new Error('bad response');
-    // Validate each question
-    const valid=qs.filter(q=>q.q&&Array.isArray(q.a)&&q.a.length===4&&typeof q.correct==='number');
-    if(valid.length<3)throw new Error('invalid questions');
-    quizState.questions=valid.slice(0,7);
-    document.getElementById('quiz-loading').style.display='none';
-    renderQ();
-  }catch(e){
-    console.warn('Quiz AI failed, using fallback:',e);
-    document.getElementById('quiz-loading').style.display='none';
-    quizState.questions=fallback;
-    renderQ();
-  }
+  try{const today=new Date().toDateString();const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:`Ты создаёшь футбольную викторину. Сегодня ${today}. ТОЛЬКО JSON без markdown.`,messages:[{role:'user',content:'7 уникальных вопросов о футболе разной сложности (история, игроки, чемпионаты, EA FC Mobile). JSON:\n[{"q":"?","a":["В1","В2","В3","В4"],"correct":0,"pts":10},...]\npts: лёгкий=10, средний=20, сложный=30.'}]})});const data=await resp.json();let text=data.content?.[0]?.text||'';text=text.replace(/```json|```/g,'').trim();const qs=JSON.parse(text);if(Array.isArray(qs)&&qs.length>0){quizState.questions=qs;document.getElementById('quiz-loading').style.display='none';renderQ();}else throw new Error();}
+  catch(e){document.getElementById('quiz-loading').style.display='none';quizState.questions=[{q:'Кто забил больше всего голов в истории ЧМ?',a:['Роналду','Мирослав Клозе','Пеле','Месси'],correct:1,pts:20},{q:'В каком году Бразилия выиграла 5-й ЧМ?',a:['1994','1998','2002','2006'],correct:2,pts:10},{q:'Какой клуб больше всех выигрывал ЛЧ?',a:['Барселона','Милан','Бавария','Реал Мадрид'],correct:3,pts:10},{q:'Кто выиграл Золотой мяч в 2023?',a:['Мбаппе','Холанд','Месси','Виниcius'],correct:2,pts:20},{q:'Сколько раз Месси выигрывал Золотой мяч?',a:['6','7','8','9'],correct:2,pts:30},{q:'Как называлась игра до EA FC Mobile?',a:['PES Mobile','FIFA Mobile','Football Stars','Top Eleven'],correct:1,pts:10},{q:'Что означает ОБЩ в EA FC Mobile?',a:['Общий рейтинг','Общий счёт','Общий бюджет','Общее число побед'],correct:0,pts:20}];renderQ();}
 }
 function renderQ(){const area=document.getElementById('quiz-content');const qs=quizState.questions;if(quizState.current>=qs.length){showQuizResult();return;}const q=qs[quizState.current];quizState.answered=false;area.innerHTML=`<div class="quiz-timer"><div class="quiz-timer-bar" id="qtbar" style="width:100%"></div></div><div class="quiz-card"><div class="quiz-num">ВОПРОС ${quizState.current+1}/${qs.length} · ${q.pts||20} ОЧКОВ</div><div class="quiz-q">${esc(q.q)}</div><div class="quiz-answers">${q.a.map((a,i)=>`<button class="qa" onclick="answerQ(${i})">${esc(a)}</button>`).join('')}</div></div><button class="quiz-next" id="qnext" onclick="nextQ()">СЛЕДУЮЩИЙ →</button>`;startQTimer(20);}
 function startQTimer(sec){quizState.timerVal=sec;if(quizState.timer)clearInterval(quizState.timer);quizState.timer=setInterval(()=>{quizState.timerVal--;const b=document.getElementById('qtbar');if(b)b.style.width=(quizState.timerVal/sec*100)+'%';if(quizState.timerVal<=0){clearInterval(quizState.timer);if(!quizState.answered){quizState.answered=true;quizState.streak=0;const q=quizState.questions[quizState.current];document.querySelectorAll('.qa').forEach((btn,i)=>{btn.disabled=true;if(i===q.correct)btn.classList.add('correct');});const nb=document.getElementById('qnext');if(nb)nb.style.display='block';toast('⏰ Время!',true);}}},1000);}
@@ -1409,261 +1063,6 @@ SX.fillStyle='rgba(0,0,0,.6)';SX.fillRect(0,0,SC.width,20);SX.fillStyle='#00ff88
 document.addEventListener('keydown',e=>{if(!document.getElementById('gp-snake').classList.contains('on')||!snakeRunning)return;if(e.key==='ArrowUp'&&snakeDir.y!==1)snakeNextDir={x:0,y:-1};else if(e.key==='ArrowDown'&&snakeDir.y!==-1)snakeNextDir={x:0,y:1};else if(e.key==='ArrowLeft'&&snakeDir.x!==1)snakeNextDir={x:-1,y:0};else if(e.key==='ArrowRight'&&snakeDir.x!==-1)snakeNextDir={x:1,y:0};else if(e.key==='w'&&snakeDir.y!==1)snakeNextDir={x:0,y:-1};else if(e.key==='s'&&snakeDir.y!==-1)snakeNextDir={x:0,y:1};else if(e.key==='a'&&snakeDir.x!==1)snakeNextDir={x:-1,y:0};else if(e.key==='d'&&snakeDir.x!==-1)snakeNextDir={x:1,y:0};});
 // Touch swipe for snake - initialized in initSnake()
 let tSnakeX=0,tSnakeY=0;
-
-
-// ═══ MARIO PLATFORMER ════════════════════════
-let MC,MX,marioInterval=null,marioDiff=1,marioRunning=false;
-let mKeys={left:false,right:false,jump:false};
-let mPlayer={x:60,y:200,vx:0,vy:0,w:24,h:28,onGround:false,lives:3,score:0,coins:0,invincible:0};
-let mPlatforms=[],mEnemies=[],mCoins=[],mCamera={x:0},mWorld=2800,mLevelTime=0,mFrame=0;
-const MG=0.55,MJUMP=-11,MSPEED=3.5;
-
-function setMarioDiff(d,btn){marioDiff=d;document.querySelectorAll('#gp-mario .diff-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');if(marioRunning)marioReset();}
-function initMario(){
-  MC=document.getElementById('mario-canvas');MX=MC.getContext('2d');
-  const w=Math.min(560,MC.parentElement.offsetWidth||560);MC.width=w;MC.height=Math.round(w*0.57);
-  MC.width=560;MC.height=320;
-  marioRunning=false;drawMarioIdle();
-  document.addEventListener('keydown',e=>{
-    if(!document.getElementById('gp-mario').classList.contains('on'))return;
-    if(e.key==='ArrowLeft'||e.key==='a')mKeys.left=true;
-    if(e.key==='ArrowRight'||e.key==='d')mKeys.right=true;
-    if((e.key==='ArrowUp'||e.key===' '||e.key==='w')&&mPlayer.onGround){e.preventDefault();marioJump();}
-  });
-  document.addEventListener('keyup',e=>{
-    if(e.key==='ArrowLeft'||e.key==='a')mKeys.left=false;
-    if(e.key==='ArrowRight'||e.key==='d')mKeys.right=false;
-  });
-}
-function drawMarioIdle(){if(!MX||!MC)return;MX.fillStyle='#1a0a2e';MX.fillRect(0,0,MC.width,MC.height);MX.fillStyle='#ff0044';MX.font='bold 16px monospace';MX.textAlign='center';MX.fillText('🍄 НАЖМИТЕ СТАРТ',MC.width/2,MC.height/2);}
-function buildLevel(){
-  const W=MC.width,H=MC.height;
-  mPlatforms=[
-    {x:0,y:H-30,w:mWorld,h:30,c:'#3a2a0a'},// ground
-    {x:200,y:H-100,w:100,h:14,c:'#5a3a1a'},{x:380,y:H-150,w:80,h:14,c:'#5a3a1a'},
-    {x:520,y:H-120,w:120,h:14,c:'#5a3a1a'},{x:700,y:H-180,w:80,h:14,c:'#5a3a1a'},
-    {x:850,y:H-130,w:100,h:14,c:'#5a3a1a'},{x:1000,y:H-200,w:80,h:14,c:'#5a3a1a'},
-    {x:1150,y:H-150,w:150,h:14,c:'#5a3a1a'},{x:1380,y:H-180,w:80,h:14,c:'#5a3a1a'},
-    {x:1550,y:H-120,w:100,h:14,c:'#5a3a1a'},{x:1720,y:H-200,w:80,h:14,c:'#5a3a1a'},
-    {x:1900,y:H-160,w:120,h:14,c:'#5a3a1a'},{x:2100,y:H-210,w:80,h:14,c:'#5a3a1a'},
-    {x:2280,y:H-160,w:100,h:14,c:'#5a3a1a'},{x:2450,y:H-130,w:80,h:14,c:'#5a3a1a'},
-    {x:2600,y:H-180,w:120,h:14,c:'#ff0044'},// finish
-  ];
-  const enemyCount=5+marioDiff*3;
-  mEnemies=[];
-  const enemyXs=[350,600,900,1200,1500,1800,2100,2400];
-  for(let i=0;i<Math.min(enemyCount,enemyXs.length);i++){mEnemies.push({x:enemyXs[i],y:H-58,w:22,h:22,vx:-(0.8+marioDiff*0.4),alive:true});}
-  mCoins=[];
-  const coinXs=[220,400,540,730,880,1060,1180,1420,1580,1750,1940,2130,2310,2480];
-  for(const cx of coinXs)mCoins.push({x:cx,y:H-200,r:8,collected:false});
-}
-function marioStart(){
-  if(!MC)initMario();if(marioRunning)return;
-  mPlayer={x:60,y:200,vx:0,vy:0,w:24,h:28,onGround:false,lives:3,score:0,coins:0,invincible:0};
-  mCamera={x:0};mLevelTime=0;mFrame=0;
-  buildLevel();marioRunning=true;
-  document.getElementById('mario-start-btn').style.opacity='.5';
-  document.getElementById('mario-status').textContent='🍄 ВПЕРЁД!';
-  if(marioInterval)cancelAnimationFrame(marioInterval);
-  marioLoop();
-}
-function marioReset(){if(marioInterval)cancelAnimationFrame(marioInterval);marioRunning=false;document.getElementById('mario-start-btn').style.opacity='1';document.getElementById('mario-status').textContent='Нажмите СТАРТ';document.getElementById('mario-score').textContent='⭐ 0   💀 3   ⏱️ 0';drawMarioIdle();}
-function marioJump(){if(mPlayer.onGround&&marioRunning){mPlayer.vy=MJUMP;mPlayer.onGround=false;}}
-function marioLoop(){if(!marioRunning)return;updateMario();drawMario();marioInterval=requestAnimationFrame(marioLoop);}
-function updateMario(){
-  mFrame++;mLevelTime++;
-  const speed=MSPEED*(1+marioDiff*0.15);
-  if(mKeys.left)mPlayer.vx=-speed;
-  else if(mKeys.right)mPlayer.vx=speed;
-  else mPlayer.vx*=0.8;
-  mPlayer.vx=Math.max(-speed*1.2,Math.min(speed*1.2,mPlayer.vx));
-  mPlayer.vy+=MG;mPlayer.x+=mPlayer.vx;mPlayer.y+=mPlayer.vy;
-  mPlayer.onGround=false;
-  // Platform collision
-  for(const p of mPlatforms){if(mPlayer.x+mPlayer.w>p.x&&mPlayer.x<p.x+p.w&&mPlayer.y+mPlayer.h>p.y&&mPlayer.y+mPlayer.h<p.y+p.h+12&&mPlayer.vy>=0){mPlayer.y=p.y-mPlayer.h;mPlayer.vy=0;mPlayer.onGround=true;if(p.c==='#ff0044'){marioWin();}}}
-  // World bounds
-  if(mPlayer.x<0)mPlayer.x=0;
-  if(mPlayer.y>MC.height+50){loseLife();}
-  // Camera
-  mCamera.x=Math.max(0,Math.min(mWorld-MC.width,mPlayer.x-MC.width/3));
-  // Coins
-  for(const c of mCoins){if(!c.collected&&Math.abs(mPlayer.x+mPlayer.w/2-(c.x))<c.r+12&&Math.abs(mPlayer.y+mPlayer.h/2-(c.y))<c.r+12){c.collected=true;mPlayer.coins++;mPlayer.score+=50;}}
-  // Enemies
-  if(mPlayer.invincible>0)mPlayer.invincible--;
-  for(const e of mEnemies){
-    if(!e.alive)continue;
-    e.x+=e.vx;
-    // Bounce off ground edges
-    for(const p of mPlatforms){if(e.x<p.x||e.x+e.w>p.x+p.w){e.vx*=-1;}}
-    // Player stomps enemy
-    if(mPlayer.x+mPlayer.w-4>e.x&&mPlayer.x+4<e.x+e.w&&mPlayer.y+mPlayer.h>e.y&&mPlayer.y+mPlayer.h<e.y+e.h+8&&mPlayer.vy>0){e.alive=false;mPlayer.vy=-7;mPlayer.score+=100;}
-    // Enemy hits player
-    else if(mPlayer.invincible===0&&mPlayer.x+mPlayer.w-4>e.x&&mPlayer.x+4<e.x+e.w&&mPlayer.y+mPlayer.h>e.y&&mPlayer.y<e.y+e.h){loseLife();}
-  }
-  updateMarioHUD();
-}
-function loseLife(){mPlayer.lives--;mPlayer.invincible=90;mPlayer.x=60;mPlayer.y=150;mPlayer.vx=0;mPlayer.vy=0;mCamera.x=0;if(mPlayer.lives<=0){marioRunning=false;document.getElementById('mario-status').textContent='GAME OVER 💀';document.getElementById('mario-start-btn').style.opacity='1';addPoints(Math.floor(mPlayer.score/100));toast('💀 Игра окончена! +'+Math.floor(mPlayer.score/100)+' 🪙','s');}}
-function marioWin(){marioRunning=false;document.getElementById('mario-status').textContent='🏆 ПОБЕДА!';addPoints(200+mPlayer.coins*5);toast('🏆 Уровень пройден! +'+( 200+mPlayer.coins*5)+' 🪙','s');document.getElementById('mario-start-btn').style.opacity='1';}
-function updateMarioHUD(){document.getElementById('mario-score').textContent=`⭐ ${mPlayer.score}   💀 ${mPlayer.lives}   🪙 ${mPlayer.coins}`;}
-function drawMario(){
-  if(!MX||!MC)return;
-  const cx=mCamera.x;
-  // Sky
-  MX.fillStyle='#1a0a2e';MX.fillRect(0,0,MC.width,MC.height);
-  // Stars bg
-  if(mFrame%3===0){}
-  for(let i=0;i<20;i++){MX.fillStyle=`rgba(255,255,255,${0.1+((i*37+mFrame)%100)/500})`;MX.fillRect((i*137+50)%MC.width,10+(i*53)%60,2,2);}
-  // Platforms
-  for(const p of mPlatforms){
-    const px=p.x-cx;if(px>MC.width+20||px+p.w<-20)continue;
-    MX.fillStyle=p.c;MX.fillRect(px,p.y,p.w,p.h);
-    if(p.y<MC.height-30){MX.fillStyle='rgba(255,255,255,.06)';MX.fillRect(px,p.y,p.w,3);}
-    if(p.c==='#ff0044'){MX.fillStyle='#ffcc00';MX.font='10px monospace';MX.textAlign='center';MX.fillText('ФИНИШ',px+p.w/2,p.y-5);}
-  }
-  // Coins
-  for(const c of mCoins){if(c.collected)continue;const cx2=c.x-cx;if(Math.abs(cx2)>MC.width)continue;const bob=Math.sin(mFrame*0.1+c.x)*3;MX.fillStyle='#ffcc00';MX.shadowBlur=8;MX.shadowColor='#ffcc00';MX.beginPath();MX.arc(cx2,c.y+bob,c.r,0,Math.PI*2);MX.fill();MX.shadowBlur=0;}
-  // Enemies
-  for(const e of mEnemies){if(!e.alive)continue;const ex=e.x-cx;if(Math.abs(ex)>MC.width)continue;MX.fillStyle='#ff4444';MX.fillRect(ex,e.y,e.w,e.h);MX.fillStyle='#fff';MX.fillRect(ex+4,e.y+5,5,5);MX.fillRect(ex+e.w-9,e.y+5,5,5);MX.fillStyle='#ff0044';MX.fillRect(ex+5,e.y+12,4,4);MX.fillRect(ex+e.w-9,e.y+12,4,4);}
-  // Player
-  const px2=mPlayer.x-cx;
-  const flash=mPlayer.invincible>0&&mFrame%6<3;
-  if(!flash){
-    // Body
-    MX.fillStyle='#ff0044';MX.fillRect(px2,mPlayer.y,mPlayer.w,mPlayer.h);
-    // Hat
-    MX.fillStyle='#cc0022';MX.fillRect(px2-2,mPlayer.y,mPlayer.w+4,10);
-    MX.fillRect(px2+4,mPlayer.y-7,mPlayer.w-6,9);
-    // Face
-    MX.fillStyle='#ffa07a';MX.fillRect(px2+2,mPlayer.y+10,mPlayer.w-4,12);
-    // Eyes
-    MX.fillStyle='#000';MX.fillRect(px2+(mKeys.right?14:4),mPlayer.y+13,4,4);
-    // Mustache
-    MX.fillStyle='#5c3317';MX.fillRect(px2+3,mPlayer.y+17,mPlayer.w-6,3);
-    // Legs
-    MX.fillStyle=mPlayer.onGround&&(mKeys.left||mKeys.right)?'#00d4ff':'#0060aa';
-    MX.fillRect(px2+2,mPlayer.y+mPlayer.h-8,8,8);MX.fillRect(px2+mPlayer.w-10,mPlayer.y+mPlayer.h-8,8,8);
-  }
-  // HUD overlay
-  MX.fillStyle='rgba(0,0,0,.5)';MX.fillRect(0,0,MC.width,22);
-  MX.fillStyle='#ffcc00';MX.font='bold 11px monospace';MX.textAlign='left';
-  MX.fillText(`⭐${mPlayer.score}  🪙${mPlayer.coins}  💀${mPlayer.lives}`,6,15);
-  MX.textAlign='right';MX.fillStyle='#aaa';
-  MX.fillText(`${marioDiff==='1'||marioDiff===1?'НОВИЧОК':marioDiff===2?'НОРМАЛ':'ХАРДКОР'}`,MC.width-4,15);
-}
-
-// ═══ AI CHATBOT ══════════════════════════════
-let chatMode='squad';
-let chatHistory=[];
-let chatInited=false;
-
-const CHAT_SYSTEMS={
-  squad:`Ты — PSYCHO AI, дерзкий и честный советник по составам EA FC Mobile в лиге Psycho League.
-Говоришь прямо, без воды, как друг а не как робот. Можешь сказать "этот игрок шлак" или "бери его, он имба".
-Используешь разговорный русский, можешь материться если уместно. Не боишься давать жёсткие оценки.
-Когда хвалишь — говоришь конкретно почему. Когда ругаешь — тоже конкретно.
-Знаешь всё про: ОБЩ (Overall Rating), позиции (ЦАП, ЛВ, НАП, ВРТ, ЦЗ, ЦОП, ПВ, ЛЗ, ПЗ),
-схемы (4-3-3, 3-4-1-2, 4-2-2-2, 4-4-2), VS Атаку, квесты, монеты, имба-игроков.
-Отвечай коротко и по делу — не больше 3-4 предложений если не спрашивают подробно.
-Используй эмодзи но не переусердствуй.`,
-  general:`Ты — PSYCHO AI, дерзкий ИИ сайта Psycho League (EA FC Mobile).
-Говоришь как реальный пацан, без пафоса и корпоративщины. Прямой, честный, иногда саркастичный.
-Можешь шутить, троллить (по-доброму), давать честное мнение даже если оно неудобное.
-Говоришь на русском. Никакой цензуры в плане мнений о футболе и играх.
-Отвечай кратко — 2-3 предложения максимум если не надо больше.`,
-  meta:`Ты — PSYCHO AI, жёсткий аналитик мета-игры EA FC Mobile.
-Говоришь как топовый игрок который всё видел и всё знает. Без розовых очков.
-Называешь имба-вещи имбой, шлак — шлаком. Конкретные цифры, конкретные игроки.
-Структурируй ответ: что брать, что не брать, почему. Коротко и чётко.
-Русский язык, разговорный стиль, можешь материться если уместно.`
-};
-
-const CHAT_WELCOMES={
-  squad:'Йо! ⚽ PSYCHO AI на связи.\n\nСпрашивай про состав, игроков, тактику — скажу всё как есть, без лишней воды. Кого берёшь, кого выкидываешь — разберём.',
-  general:'Йо! 🤖 PSYCHO AI здесь.\n\nГовори что хочешь — футбол, игра, лига, жизнь. Отвечу честно и без фильтров 😏',
-  meta:'Йо! 📊 Мета-анализ от PSYCHO AI.\n\nСпрашивай что имба, что шлак, какая схема топ прямо сейчас. Скажу как есть.'
-};
-
-function setChatMode(mode,btn){
-  chatMode=mode;
-  document.querySelectorAll('.chat-mode-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  chatHistory=[];
-  const msgs=document.getElementById('chat-messages');
-  if(msgs){msgs.innerHTML='';addChatMsg('ai',CHAT_WELCOMES[mode]);}
-  updateQuickBtns(mode);
-}
-
-function updateQuickBtns(mode){
-  const quickMap={
-    squad:['Какая лучшая схема сейчас?','Оцени мой состав с ОБЩ 122','Кто лучший вратарь?','Как улучшить атаку?','Советуй игроков за монеты'],
-    general:['Расскажи про Psycho League','Что нового в EA FC Mobile?','Как набрать очки в квизе?','Интересный факт о футболе','Кто лучший игрок в истории?'],
-    meta:['Лучшая схема для VS Атаки','Топ-5 нападающих ОБЩ 122','Как выиграть квесты быстро?','3-4-1-2 или 4-3-3 — что лучше?','Лучший состав за бесплатно']
-  };
-  const btns=document.getElementById('chat-quick-btns');
-  if(btns)btns.innerHTML=(quickMap[mode]||quickMap.squad).map(q=>`<button class="chat-quick" onclick="sendQuick('${q.replace(/'/g,"\\'")}')">💬 ${q}</button>`).join('');
-}
-
-function initChatBot(){
-  if(chatInited)return;chatInited=true;
-  chatHistory=[];
-  addChatMsg('ai',CHAT_WELCOMES[chatMode]);
-}
-
-function addChatMsg(role,text){
-  const msgs=document.getElementById('chat-messages');if(!msgs)return;
-  const div=document.createElement('div');div.className=`chat-msg ${role==='user'?'user':''}`;
-  const ava=document.createElement('div');ava.className=`chat-msg-ava ${role==='ai'?'ai':'user-ava'}`;
-  ava.textContent=role==='ai'?'🤖':(curUser?.avatar||'⚽');
-  const bubble=document.createElement('div');bubble.className=`chat-bubble ${role==='ai'?'ai':'user'}`;
-  // Format text - bold **text**, newlines
-  bubble.innerHTML=esc(text).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  div.appendChild(ava);div.appendChild(bubble);
-  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
-}
-
-function addTyping(){
-  const msgs=document.getElementById('chat-messages');if(!msgs)return;
-  const div=document.createElement('div');div.className='chat-msg';div.id='chat-typing-indicator';
-  div.innerHTML='<div class="chat-msg-ava ai">🤖</div><div class="chat-bubble ai"><div class="chat-typing"><span></span><span></span><span></span></div></div>';
-  msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
-}
-
-function removeTyping(){const t=document.getElementById('chat-typing-indicator');if(t)t.remove();}
-
-function sendQuick(text){document.getElementById('chat-input').value=text;sendChatMsg();}
-
-async function sendChatMsg(){
-  const inp=document.getElementById('chat-input');
-  const text=inp.value.trim();if(!text)return;
-  inp.value='';
-  const btn=document.getElementById('chat-send');btn.disabled=true;
-  addChatMsg('user',text);
-  chatHistory.push({role:'user',content:text});
-  addTyping();
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:800,
-        system:CHAT_SYSTEMS[chatMode]||CHAT_SYSTEMS.squad,
-        messages:chatHistory.slice(-10)// last 10 messages for context
-      })
-    });
-    const data=await resp.json();
-    const reply=(data.content?.[0]?.text||'Извини, не смог ответить. Попробуй ещё раз!').trim();
-    removeTyping();
-    addChatMsg('ai',reply);
-    chatHistory.push({role:'assistant',content:reply});
-    // Keep history max 20 messages
-    if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-  }catch(e){
-    removeTyping();
-    addChatMsg('ai','⚠️ Ошибка соединения. Проверь интернет и попробуй снова!');
-  }
-  btn.disabled=false;inp.focus();
-}
 
 </script>
 </body>
