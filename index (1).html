@@ -1123,7 +1123,14 @@ function resetBall(){const d=PDIFF[pongDiff];PONG.ball={x:PC?PC.width/2:190,y:PC
 function pongStart(){if(!PONG.init)initPong();if(PONG.running)return;PONG.running=true;document.getElementById('gbstart').classList.remove('on');document.getElementById('gst').textContent='В игре · '+pongDiff.toUpperCase();pongLoop();}
 function pongReset(){PONG.running=false;if(PONG.raf){cancelAnimationFrame(PONG.raf);PONG.raf=null;}PONG.sc={p:0,c:0};document.getElementById('sply').textContent='0';document.getElementById('scpu').textContent='0';document.getElementById('gbstart').classList.add('on');document.getElementById('gst').textContent='Нажмите СТАРТ';if(PONG.init){resetBall();drawPong();}}
 function pongLoop(){if(!PONG.running)return;updatePong();drawPong();PONG.raf=requestAnimationFrame(pongLoop);}
-function updatePong(){const b=PONG.ball,p=PONG.ply,c=PONG.cpu,d=PDIFF[pongDiff];b.x+=b.vx;b.y+=b.vy;if(b.x-b.r<0){b.x=b.r;b.vx*=-1;playSound("pong_wall");}if(b.x+b.r>PC.width){b.x=PC.width-b.r;b.vx*=-1;playSound("pong_wall");}const cc=c.x+c.w/2;if(cc<b.x-3)c.x+=d.cpu;else if(cc>b.x+3)c.x-=d.cpu;c.x=Math.max(0,Math.min(PC.width-c.w,c.x));p.x=Math.max(0,Math.min(PC.width-p.w,p.x));if(b.y+b.r>=p.y&&b.y+b.r<=p.y+p.h&&b.x>=p.x&&b.x<=p.x+p.w&&b.vy>0){playSound("pong_hit");b.vy=-Math.abs(b.vy)*1.04;b.vx+=(b.x-(p.x+p.w/2))/9;b.vy=Math.max(b.vy,-d.ball*1.8);}if(b.y-b.r<=c.y+c.h&&b.y-b.r>=c.y&&b.x>=c.x&&b.x<=c.x+c.w&&b.vy<0){playSound("pong_hit");b.vy=Math.abs(b.vy)*1.04;b.vx+=(b.x-(c.x+c.w/2))/9;b.vy=Math.min(b.vy,d.ball*1.8);}if(b.y+b.r<0){PONG.sc.p++;document.getElementById('sply').textContent=PONG.sc.p;playSound('pong_score');toast('🎉 +1 Вы!');resetBall();b.vy=d.ball;}if(b.y-b.r>PC.height){PONG.sc.c++;document.getElementById('scpu').textContent=PONG.sc.c;playSound('pong_score');toast('CPU +1',true);resetBall();b.vy=-d.ball;}}
+function updatePong(){const b=PONG.ball,p=PONG.ply,c=PONG.cpu,d=PDIFF[pongDiff];b.x+=b.vx;b.y+=b.vy;if(b.x-b.r<0){b.x=b.r;b.vx*=-1;playSound("pong_wall");}if(b.x+b.r>PC.width){b.x=PC.width-b.r;b.vx*=-1;playSound("pong_wall");}const cc=c.x+c.w/2;if(cc<b.x-3)c.x+=d.cpu;else if(cc>b.x+3)c.x-=d.cpu;c.x=Math.max(0,Math.min(PC.width-c.w,c.x));p.x=Math.max(0,Math.min(PC.width-p.w,p.x));if(b.y+b.r>=p.y&&b.y+b.r<=p.y+p.h&&b.x>=p.x&&b.x<=p.x+p.w&&b.vy>0){
+  playSound("pong_hit");
+  const hitPos=(b.x-(p.x+p.w/2))/(p.w/2);
+  b.vx=hitPos*d.ball*1.2;
+  b.vy=-Math.abs(b.vy)*1.06;
+  const spd=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+  if(spd>d.ball*2.2){const r=d.ball*2.2/spd;b.vx*=r;b.vy*=r;}
+}if(b.y-b.r<=c.y+c.h&&b.y-b.r>=c.y&&b.x>=c.x&&b.x<=c.x+c.w&&b.vy<0){playSound("pong_hit");b.vy=Math.abs(b.vy)*1.04;b.vx+=(b.x-(c.x+c.w/2))/9;b.vy=Math.min(b.vy,d.ball*1.8);}if(b.y+b.r<0){PONG.sc.p++;document.getElementById('sply').textContent=PONG.sc.p;playSound('pong_score');toast('🎉 +1 Вы!');resetBall();b.vy=d.ball;}if(b.y-b.r>PC.height){PONG.sc.c++;document.getElementById('scpu').textContent=PONG.sc.c;playSound('pong_score');toast('CPU +1',true);resetBall();b.vy=-d.ball;}}
 function drawPong(){if(!PC||!PX)return;PX.clearRect(0,0,PC.width,PC.height);PX.strokeStyle='rgba(255,255,255,.03)';PX.lineWidth=1;for(let x=0;x<PC.width;x+=40){PX.beginPath();PX.moveTo(x,0);PX.lineTo(x,PC.height);PX.stroke();}for(let y=0;y<PC.height;y+=40){PX.beginPath();PX.moveTo(0,y);PX.lineTo(PC.width,y);PX.stroke();}PX.setLineDash([7,7]);PX.strokeStyle='rgba(255,255,255,.09)';PX.beginPath();PX.moveTo(0,PC.height/2);PX.lineTo(PC.width,PC.height/2);PX.stroke();PX.setLineDash([]);PX.shadowBlur=12;PX.shadowColor='#ff0044';PX.fillStyle='#ff0044';PX.fillRect(PONG.cpu.x,PONG.cpu.y,PONG.cpu.w,PONG.cpu.h);PX.shadowColor='#00d4ff';PX.fillStyle='#00d4ff';PX.fillRect(PONG.ply.x,PONG.ply.y,PONG.ply.w,PONG.ply.h);PX.shadowColor='#fff';PX.shadowBlur=18;PX.beginPath();PX.arc(PONG.ball.x,PONG.ball.y,PONG.ball.r,0,Math.PI*2);PX.fillStyle='#fff';PX.fill();PX.shadowBlur=0;}
 
 let RC={running:false,raf:null,score:0,speed:3,lives:3,init:false},RC_DIFF=1,RCC,RCX;
@@ -1133,7 +1140,13 @@ function initRace(){RCC=document.getElementById('race-canvas');RCX=RCC.getContex
 function drawRaceIdle(){if(!RCX)return;RCX.fillStyle='#010a01';RCX.fillRect(0,0,RCC.width,RCC.height);RCX.fillStyle='#1a1a1a';RCX.fillRect(RCC.width*.2,0,RCC.width*.6,RCC.height);RCX.fillStyle='#00ff88';RCX.font='bold 14px monospace';RCX.textAlign='center';RCX.fillText('Нажмите СТАРТ',RCC.width/2,RCC.height/2);}
 function raceStart(){if(!RC.init)initRace();if(RC.running)return;RC.running=true;RC.score=0;RC.lives=3;RC.speed=3*RC_DIFF;obstacles=[];pcar.x=RCC.width/2-pcar.w/2;document.getElementById('rbstart').classList.remove('on');document.getElementById('race-status').textContent='🏎️ ГОНКА!';raceLoop();}
 function raceReset(){RC.running=false;if(RC.raf){cancelAnimationFrame(RC.raf);RC.raf=null;}document.getElementById('rbstart').classList.add('on');document.getElementById('race-status').textContent='Нажмите СТАРТ';document.getElementById('race-score').textContent='Счёт: 0';if(RC.init)drawRaceIdle();}
-function raceLoop(){if(!RC.running)return;updateRace();drawRace();RC.raf=requestAnimationFrame(raceLoop);}
+function raceLoop(){
+  if(!RC.running)return;
+  updateRace();drawRace();
+  // Engine sound every 20 frames
+  if(RC.score%20===0&&RC.score>0)playSound('race_engine');
+  RC.raf=requestAnimationFrame(raceLoop);
+}
 function updateRace(){if((keys['ArrowLeft']||keys['a'])&&pcar.x>RCC.width*.2)pcar.x-=4;if((keys['ArrowRight']||keys['d'])&&pcar.x<RCC.width*.8-pcar.w)pcar.x+=4;roadOff=(roadOff+RC.speed)%60;RC.score++;RC.speed=3*RC_DIFF+RC.score/500;document.getElementById('race-score').textContent='Счёт: '+RC.score;if(Math.random()<.025){const lw=RCC.width*.6,lx=RCC.width*.2;obstacles.push({x:lx+Math.random()*(lw-30),y:-60,w:30,h:50,c:['#ff4444','#4444ff','#ffcc00'][Math.floor(Math.random()*3)]});}for(let i=obstacles.length-1;i>=0;i--){obstacles[i].y+=RC.speed;if(obstacles[i].y>RCC.height){obstacles.splice(i,1);continue;}if(pcar.x<obstacles[i].x+obstacles[i].w&&pcar.x+pcar.w>obstacles[i].x&&pcar.y<obstacles[i].y+obstacles[i].h&&pcar.y+pcar.h>obstacles[i].y){obstacles.splice(i,1);RC.lives--;playSound('race_crash');toast('💥 Жизней: '+RC.lives,true);if(RC.lives<=0){RC.running=false;toast('🏁 Счёт: '+RC.score,'s');document.getElementById('race-status').textContent='GAME OVER · '+RC.score;document.getElementById('rbstart').classList.add('on');addPoints(Math.floor(RC.score/50));}}}}
 function drawRace(){const ctx=RCX,w=RCC.width,h=RCC.height;ctx.fillStyle='#0a1a0a';ctx.fillRect(0,0,w,h);ctx.fillStyle='#1c1c1c';ctx.fillRect(w*.2,0,w*.6,h);ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.setLineDash([20,20]);ctx.lineDashOffset=-roadOff;ctx.beginPath();ctx.moveTo(w*.5,0);ctx.lineTo(w*.5,h);ctx.stroke();ctx.setLineDash([]);for(const ob of obstacles){ctx.fillStyle=ob.c;ctx.fillRect(ob.x,ob.y,ob.w,ob.h);}ctx.fillStyle='#00d4ff';ctx.fillRect(pcar.x,pcar.y,pcar.w,pcar.h);ctx.fillStyle='#ff0044';ctx.font='12px monospace';ctx.textAlign='left';ctx.fillText('❤️'.repeat(Math.max(0,RC.lives)),4,16);ctx.fillStyle='#00ff88';ctx.textAlign='right';ctx.fillText('x'+RC_DIFF,w-4,16);}
 
@@ -1155,15 +1168,150 @@ const MG=0.55,MJUMP=-11,MSPD=3.5,MWORLD=2800;
 function setMarioDiff(d,btn){marioDiff=d;document.querySelectorAll('#gp-mario .diff-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');if(marioRunning)marioReset();}
 function initMario(){MC=document.getElementById('mario-canvas');MX=MC.getContext('2d');MC.width=Math.min(560,MC.parentElement.offsetWidth||560);MC.height=320;marioRunning=false;drawMarioIdle();document.addEventListener('keydown',e=>{if(!document.getElementById('gp-mario').classList.contains('on'))return;if(e.key==='ArrowLeft'||e.key==='a')mKeys.left=true;if(e.key==='ArrowRight'||e.key==='d')mKeys.right=true;if(e.key==='ArrowUp'||e.key===' '||e.key==='w'){e.preventDefault();marioJump();}});document.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')mKeys.left=false;if(e.key==='ArrowRight'||e.key==='d')mKeys.right=false;});}
 function drawMarioIdle(){if(!MX||!MC)return;MX.fillStyle='#1a0a2e';MX.fillRect(0,0,MC.width,MC.height);MX.fillStyle='#ff0044';MX.font='bold 16px monospace';MX.textAlign='center';MX.fillText('Нажмите СТАРТ',MC.width/2,MC.height/2);}
-function buildMarioLevel(){const H=MC.height;mPlats=[{x:0,y:H-30,w:MWORLD,h:30,c:'#3a2a0a'},{x:200,y:H-100,w:100,h:14,c:'#5a3a1a'},{x:380,y:H-150,w:80,h:14,c:'#5a3a1a'},{x:520,y:H-120,w:120,h:14,c:'#5a3a1a'},{x:700,y:H-180,w:80,h:14,c:'#5a3a1a'},{x:850,y:H-130,w:100,h:14,c:'#5a3a1a'},{x:1000,y:H-200,w:80,h:14,c:'#5a3a1a'},{x:1200,y:H-150,w:150,h:14,c:'#5a3a1a'},{x:1500,y:H-180,w:80,h:14,c:'#5a3a1a'},{x:1750,y:H-200,w:80,h:14,c:'#5a3a1a'},{x:2000,y:H-160,w:120,h:14,c:'#5a3a1a'},{x:2300,y:H-210,w:80,h:14,c:'#5a3a1a'},{x:2550,y:H-180,w:120,h:14,c:'#ff0044'}];const exs=[350,650,950,1350,1650,2050,2400];mEnemies=[];for(let i=0;i<Math.min(5+marioDiff*2,exs.length);i++)mEnemies.push({x:exs[i],y:H-58,w:22,h:22,vx:-(0.8+marioDiff*0.4),alive:true});const cxs=[220,400,550,750,900,1100,1250,1550,1800,2050,2350,2600];mCoins=cxs.map(cx=>({x:cx,y:H-210,r:8,got:false}));}
+function buildMarioLevel(){const H=MC.height;mPlats=[
+  {x:0,y:H-30,w:MWORLD,h:30,c:'#3a2a0a'},
+  {x:200,y:H-100,w:110,h:14,c:'#5a3a1a'},{x:380,y:H-155,w:85,h:14,c:'#5a3a1a'},
+  {x:530,y:H-120,w:130,h:14,c:'#5a3a1a'},{x:720,y:H-185,w:85,h:14,c:'#5a3a1a'},
+  {x:870,y:H-135,w:110,h:14,c:'#5a3a1a'},{x:1050,y:H-205,w:85,h:14,c:'#5a3a1a'},
+  {x:1220,y:H-155,w:160,h:14,c:'#5a3a1a'},{x:1480,y:H-185,w:85,h:14,c:'#5a3a1a'},
+  {x:1650,y:H-140,w:110,h:14,c:'#5a3a1a'},{x:1820,y:H-205,w:85,h:14,c:'#5a3a1a'},
+  {x:2010,y:H-165,w:130,h:14,c:'#5a3a1a'},{x:2230,y:H-215,w:85,h:14,c:'#5a3a1a'},
+  {x:2420,y:H-165,w:110,h:14,c:'#5a3a1a'},
+  {x:2600,y:H-195,w:140,h:14,c:'#ff0044',fin:true}
+];const exs=[350,650,950,1350,1650,2050,2400];mEnemies=[];for(let i=0;i<Math.min(5+marioDiff*2,exs.length);i++)mEnemies.push({x:exs[i],y:H-58,w:22,h:22,vx:-(0.8+marioDiff*0.4),alive:true});const cxs=[220,400,550,750,900,1100,1250,1550,1800,2050,2350,2600];mCoins=cxs.map(cx=>({x:cx,y:H-210,r:8,got:false}));}
 function marioStart(){if(!MC)initMario();if(marioRunning)return;mPlayer={x:60,y:200,vx:0,vy:0,w:24,h:28,onGround:false,lives:3,score:0,coins:0,inv:0};mCam={x:0};mFrame=0;buildMarioLevel();marioRunning=true;document.getElementById('mario-start-btn').style.opacity='.5';document.getElementById('mario-status').textContent='ВПЕРЁД!';if(marioRAF)cancelAnimationFrame(marioRAF);marioLoop();}
 function marioReset(){if(marioRAF)cancelAnimationFrame(marioRAF);marioRunning=false;document.getElementById('mario-start-btn').style.opacity='1';document.getElementById('mario-status').textContent='Нажмите СТАРТ';document.getElementById('mario-score').textContent='⭐ 0   💀 3';if(MC)drawMarioIdle();}
 function marioJump(){if(mPlayer.onGround&&marioRunning){playSound("mario_jump");mPlayer.vy=MJUMP;mPlayer.onGround=false;}}
 function marioLoop(){if(!marioRunning)return;updateMario();drawMario();marioRAF=requestAnimationFrame(marioLoop);}
-function updateMario(){mFrame++;const spd=MSPD*(1+marioDiff*.15);if(mKeys.left)mPlayer.vx=-spd;else if(mKeys.right)mPlayer.vx=spd;else mPlayer.vx*=0.8;mPlayer.vy+=MG;mPlayer.x+=mPlayer.vx;mPlayer.y+=mPlayer.vy;mPlayer.onGround=false;if(mPlayer.x<0)mPlayer.x=0;for(const p of mPlats){if(mPlayer.x+mPlayer.w>p.x&&mPlayer.x<p.x+p.w&&mPlayer.y+mPlayer.h>p.y&&mPlayer.y+mPlayer.h<p.y+p.h+12&&mPlayer.vy>=0){mPlayer.y=p.y-mPlayer.h;mPlayer.vy=0;mPlayer.onGround=true;if(p.c==='#ff0044')marioWin();}}mCam.x=Math.max(0,Math.min(MWORLD-MC.width,mPlayer.x-MC.width/3));if(mPlayer.y>MC.height+50)marioLoseLife();if(mPlayer.inv>0)mPlayer.inv--;for(const c of mCoins){if(!c.got&&Math.abs(mPlayer.x+mPlayer.w/2-c.x)<c.r+12&&Math.abs(mPlayer.y+mPlayer.h/2-c.y)<c.r+12){c.got=true;mPlayer.coins++;mPlayer.score+=50;playSound("mario_coin");}}for(const e of mEnemies){if(!e.alive)continue;e.x+=e.vx;if(e.x<0||e.x+e.w>MWORLD)e.vx*=-1;if(mPlayer.x+mPlayer.w-4>e.x&&mPlayer.x+4<e.x+e.w&&mPlayer.y+mPlayer.h>e.y&&mPlayer.y+mPlayer.h<e.y+e.h+8&&mPlayer.vy>0){e.alive=false;mPlayer.vy=-7;mPlayer.score+=100;playSound("mario_stomp");}else if(mPlayer.inv===0&&mPlayer.x+mPlayer.w-4>e.x&&mPlayer.x+4<e.x+e.w&&mPlayer.y+mPlayer.h>e.y&&mPlayer.y<e.y+e.h)marioLoseLife();}document.getElementById('mario-score').textContent='⭐ '+mPlayer.score+'   💀 '+mPlayer.lives;}
+function updateMario(){
+  mFrame++;
+  const spd=MSPD*(1+marioDiff*.18);
+  const accel=0.6,friction=0.82,airFriction=0.92;
+  // Horizontal movement with acceleration & friction
+  if(mKeys.left){mPlayer.vx-=accel;if(mPlayer.vx<-spd)mPlayer.vx=-spd;}
+  else if(mKeys.right){mPlayer.vx+=accel;if(mPlayer.vx>spd)mPlayer.vx=spd;}
+  else{mPlayer.vx*=(mPlayer.onGround?friction:airFriction);}
+  // Gravity with terminal velocity
+  mPlayer.vy=Math.min(mPlayer.vy+MG, 18);
+  // Move X first, check collisions
+  mPlayer.x+=mPlayer.vx;
+  if(mPlayer.x<0){mPlayer.x=0;mPlayer.vx=0;}
+  if(mPlayer.x+mPlayer.w>MWORLD){mPlayer.x=MWORLD-mPlayer.w;mPlayer.vx=0;}
+  // Platform collision X
+  for(const p of mPlats){
+    if(mPlayer.y+mPlayer.h>p.y+2&&mPlayer.y<p.y+p.h){
+      if(mPlayer.vx>0&&mPlayer.x+mPlayer.w>p.x&&mPlayer.x+mPlayer.w<p.x+15){mPlayer.x=p.x-mPlayer.w;mPlayer.vx=0;}
+      if(mPlayer.vx<0&&mPlayer.x<p.x+p.w&&mPlayer.x>p.x+p.w-15){mPlayer.x=p.x+p.w;mPlayer.vx=0;}
+    }
+  }
+  // Move Y
+  mPlayer.y+=mPlayer.vy;
+  mPlayer.onGround=false;
+  // Platform collision Y
+  for(const p of mPlats){
+    if(mPlayer.x+mPlayer.w-3>p.x&&mPlayer.x+3<p.x+p.w){
+      // Landing on top
+      if(mPlayer.vy>=0&&mPlayer.y+mPlayer.h>=p.y&&mPlayer.y+mPlayer.h<=p.y+p.h+8){
+        mPlayer.y=p.y-mPlayer.h;mPlayer.vy=0;mPlayer.onGround=true;
+        if(p.fin)marioWin();
+      }
+      // Hitting ceiling
+      else if(mPlayer.vy<0&&mPlayer.y<=p.y+p.h&&mPlayer.y>=p.y){
+        mPlayer.y=p.y+p.h;mPlayer.vy=Math.abs(mPlayer.vy)*0.3;
+      }
+    }
+  }
+  // Camera - smooth follow
+  const targetCam=mPlayer.x-MC.width/3;
+  mCam.x+=(targetCam-mCam.x)*0.12;
+  mCam.x=Math.max(0,Math.min(MWORLD-MC.width,mCam.x));
+  // Fall death
+  if(mPlayer.y>MC.height+80)marioLoseLife();
+  // Invincibility frames
+  if(mPlayer.inv>0)mPlayer.inv--;
+  // Coins
+  for(const c of mCoins){
+    if(!c.got&&Math.abs(mPlayer.x+mPlayer.w/2-c.x)<c.r+14&&Math.abs(mPlayer.y+mPlayer.h/2-c.y)<c.r+14){
+      c.got=true;mPlayer.coins++;mPlayer.score+=50;c.animY=c.y;c.animT=20;
+      playSound('mario_coin');
+    }
+    if(c.animT>0){c.animY-=2;c.animT--;}
+  }
+  // Enemies - patrol with edge detection
+  for(const e of mEnemies){
+    if(!e.alive)continue;
+    e.x+=e.vx*(1+marioDiff*0.2);
+    e.animFrame=(e.animFrame||0)+1;
+    // Turn at edges & walls
+    let onEdge=true;
+    for(const p of mPlats){
+      if(p.y>MC.height-50)continue; // skip ground check for ground
+      const footX=e.vx>0?e.x+e.w+2:e.x-2;
+      if(footX>p.x&&footX<p.x+p.w&&Math.abs(e.y+e.h-p.y)<8){onEdge=false;break;}
+    }
+    if(e.x<=0||e.x+e.w>=MWORLD)e.vx*=-1;
+    // Wall collision with platforms
+    for(const p of mPlats){
+      if(e.y+e.h>p.y+2&&e.y<p.y+p.h){
+        if(e.x+e.w>p.x&&e.x+e.w<p.x+20&&e.vx>0){e.vx*=-1;}
+        if(e.x<p.x+p.w&&e.x>p.x+p.w-20&&e.vx<0){e.vx*=-1;}
+      }
+    }
+    // Stomp check - player lands on enemy from above
+    const overlapX=mPlayer.x+mPlayer.w-4>e.x&&mPlayer.x+4<e.x+e.w;
+    const stompY=mPlayer.y+mPlayer.h>=e.y&&mPlayer.y+mPlayer.h<=e.y+e.h&&mPlayer.vy>1;
+    if(overlapX&&stompY){
+      e.alive=false;e.deathAnim=15;
+      mPlayer.vy=-(MJUMP*0.7);mPlayer.score+=200;
+      playSound('mario_stomp');
+      toast('👊 +200!');
+    }
+    // Hit player
+    else if(mPlayer.inv===0&&overlapX&&mPlayer.y+mPlayer.h>e.y+4&&mPlayer.y<e.y+e.h-4){
+      marioLoseLife();
+    }
+  }
+  // Score display
+  document.getElementById('mario-score').textContent='⭐ '+mPlayer.score+'  🪙 '+mPlayer.coins+'  💀 '+mPlayer.lives;
+}
 function marioLoseLife(){playSound('mario_die');mPlayer.lives--;mPlayer.inv=90;mPlayer.x=60;mPlayer.y=150;mPlayer.vx=0;mPlayer.vy=0;mCam.x=0;if(mPlayer.lives<=0){marioRunning=false;document.getElementById('mario-status').textContent='GAME OVER 💀';document.getElementById('mario-start-btn').style.opacity='1';addPoints(Math.floor(mPlayer.score/100));toast('Game Over! +'+Math.floor(mPlayer.score/100)+' 🪙','s');}}
 function marioWin(){marioRunning=false;playSound('mario_win');document.getElementById('mario-status').textContent='ПОБЕДА! 🏆';const pts=200+mPlayer.coins*5;addPoints(pts);toast('Победа! +'+pts+' 🪙','s');document.getElementById('mario-start-btn').style.opacity='1';}
-function drawMario(){if(!MX||!MC)return;const cx=mCam.x;MX.fillStyle='#1a0a2e';MX.fillRect(0,0,MC.width,MC.height);for(let i=0;i<20;i++){MX.fillStyle='rgba(255,255,255,'+(0.1+((i*37+mFrame)%100)/800)+')';MX.fillRect((i*137+50)%MC.width,10+(i*53)%60,2,2);}for(const p of mPlats){const px=p.x-cx;if(px>MC.width+20||px+p.w<-20)continue;MX.fillStyle=p.c;MX.fillRect(px,p.y,p.w,p.h);if(p.c==='#ff0044'){MX.fillStyle='#ffcc00';MX.font='10px monospace';MX.textAlign='center';MX.fillText('ФИНИШ',px+p.w/2,p.y-5);}}for(const c of mCoins){if(c.got)continue;const bx=c.x-cx;if(Math.abs(bx)>MC.width)continue;const bob=Math.sin(mFrame*.1+c.x)*3;MX.fillStyle='#ffcc00';MX.shadowBlur=8;MX.shadowColor='#ffcc00';MX.beginPath();MX.arc(bx,c.y+bob,c.r,0,Math.PI*2);MX.fill();MX.shadowBlur=0;}for(const e of mEnemies){if(!e.alive)continue;const ex=e.x-cx;if(Math.abs(ex)>MC.width)continue;MX.fillStyle='#ff4444';MX.fillRect(ex,e.y,e.w,e.h);MX.fillStyle='#fff';MX.fillRect(ex+4,e.y+5,5,5);MX.fillRect(ex+e.w-9,e.y+5,5,5);}const px2=mPlayer.x-cx;const flash=mPlayer.inv>0&&mFrame%6<3;if(!flash){MX.fillStyle='#ff0044';MX.fillRect(px2,mPlayer.y,mPlayer.w,mPlayer.h);MX.fillStyle='#cc0022';MX.fillRect(px2-2,mPlayer.y,mPlayer.w+4,10);MX.fillRect(px2+4,mPlayer.y-7,mPlayer.w-6,9);MX.fillStyle='#ffa07a';MX.fillRect(px2+2,mPlayer.y+10,mPlayer.w-4,12);MX.fillStyle='#000';MX.fillRect(px2+(mKeys.right?14:4),mPlayer.y+13,4,4);MX.fillStyle='#5c3317';MX.fillRect(px2+3,mPlayer.y+17,mPlayer.w-6,3);MX.fillStyle=mPlayer.onGround&&(mKeys.left||mKeys.right)?'#00d4ff':'#0060aa';MX.fillRect(px2+2,mPlayer.y+mPlayer.h-8,8,8);MX.fillRect(px2+mPlayer.w-10,mPlayer.y+mPlayer.h-8,8,8);}MX.fillStyle='rgba(0,0,0,.5)';MX.fillRect(0,0,MC.width,22);MX.fillStyle='#ffcc00';MX.font='bold 11px monospace';MX.textAlign='left';MX.fillText('⭐'+mPlayer.score+'  🪙'+mPlayer.coins+'  💀'+mPlayer.lives,6,15);MX.textAlign='right';MX.fillStyle='#aaa';MX.fillText(marioDiff===1?'НОВИЧОК':marioDiff===2?'НОРМАЛ':'ХАРДКОР',MC.width-4,15);}
+function drawMario(){if(!MX||!MC)return;const cx=mCam.x;MX.fillStyle='#1a0a2e';MX.fillRect(0,0,MC.width,MC.height);for(let i=0;i<20;i++){MX.fillStyle='rgba(255,255,255,'+(0.1+((i*37+mFrame)%100)/800)+')';MX.fillRect((i*137+50)%MC.width,10+(i*53)%60,2,2);}for(const p of mPlats){const px=p.x-cx;if(px>MC.width+20||px+p.w<-20)continue;MX.fillStyle=p.c;MX.fillRect(px,p.y,p.w,p.h);if(p.c==='#ff0044'){MX.fillStyle='#ffcc00';MX.font='10px monospace';MX.textAlign='center';MX.fillText('ФИНИШ',px+p.w/2,p.y-5);}}for(const c of mCoins){
+  const bx=c.x-cx;if(Math.abs(bx)>MC.width)continue;
+  if(!c.got){
+    const bob=Math.sin(mFrame*.1+c.x)*3;
+    MX.shadowBlur=10;MX.shadowColor='#ffcc00';
+    MX.fillStyle='#ffcc00';MX.beginPath();MX.arc(bx,c.y+bob,c.r,0,Math.PI*2);MX.fill();
+    // Shine
+    MX.fillStyle='rgba(255,255,200,.6)';MX.beginPath();MX.arc(bx-2,c.y+bob-2,c.r*.4,0,Math.PI*2);MX.fill();
+    MX.shadowBlur=0;
+  } else if(c.animT>0){
+    // Float up animation when collected
+    MX.globalAlpha=c.animT/20;
+    MX.fillStyle='#ffcc00';MX.font='bold 14px monospace';MX.textAlign='center';
+    MX.fillText('+50',bx,c.animY);
+    MX.globalAlpha=1;
+  }
+}for(const e of mEnemies){
+  const ex=e.x-cx;if(Math.abs(ex)>MC.width+20)continue;
+  if(!e.alive){
+    if(e.deathAnim>0){e.deathAnim--;MX.fillStyle='#ff6666';MX.fillRect(ex,e.y+e.h-4,e.w,4);}
+    continue;
+  }
+  // Animated goomba-style enemy
+  const walk=(e.animFrame||0)%20<10;
+  MX.fillStyle='#cc2200';
+  MX.fillRect(ex,e.y+2,e.w,e.h-2);
+  // Head
+  MX.fillStyle='#aa1100';MX.fillRect(ex+2,e.y,e.w-4,8);
+  // Eyes
+  MX.fillStyle='#fff';MX.fillRect(ex+3,e.y+2,4,4);MX.fillRect(ex+e.w-7,e.y+2,4,4);
+  MX.fillStyle='#000';MX.fillRect(ex+(e.vx>0?5:3),e.y+3,2,2);MX.fillRect(ex+(e.vx>0?e.w-5:e.w-7),e.y+3,2,2);
+  // Feet
+  MX.fillStyle='#880000';
+  if(walk){MX.fillRect(ex,e.y+e.h-6,8,6);MX.fillRect(ex+e.w-6,e.y+e.h-4,6,4);}
+  else{MX.fillRect(ex,e.y+e.h-4,6,4);MX.fillRect(ex+e.w-8,e.y+e.h-6,8,6);}
+}const px2=mPlayer.x-cx;const flash=mPlayer.inv>0&&mFrame%6<3;if(!flash){MX.fillStyle='#ff0044';MX.fillRect(px2,mPlayer.y,mPlayer.w,mPlayer.h);MX.fillStyle='#cc0022';MX.fillRect(px2-2,mPlayer.y,mPlayer.w+4,10);MX.fillRect(px2+4,mPlayer.y-7,mPlayer.w-6,9);MX.fillStyle='#ffa07a';MX.fillRect(px2+2,mPlayer.y+10,mPlayer.w-4,12);MX.fillStyle='#000';MX.fillRect(px2+(mKeys.right?14:4),mPlayer.y+13,4,4);MX.fillStyle='#5c3317';MX.fillRect(px2+3,mPlayer.y+17,mPlayer.w-6,3);MX.fillStyle=mPlayer.onGround&&(mKeys.left||mKeys.right)?'#00d4ff':'#0060aa';MX.fillRect(px2+2,mPlayer.y+mPlayer.h-8,8,8);MX.fillRect(px2+mPlayer.w-10,mPlayer.y+mPlayer.h-8,8,8);}MX.fillStyle='rgba(0,0,0,.5)';MX.fillRect(0,0,MC.width,22);MX.fillStyle='#ffcc00';MX.font='bold 11px monospace';MX.textAlign='left';MX.fillText('⭐'+mPlayer.score+'  🪙'+mPlayer.coins+'  💀'+mPlayer.lives,6,15);MX.textAlign='right';MX.fillStyle='#aaa';MX.fillText(marioDiff===1?'НОВИЧОК':marioDiff===2?'НОРМАЛ':'ХАРДКОР',MC.width-4,15);}
 
 let TC,TX,tetrisInterval=null,tetrisDiff=1,tetrisRunning=false,tetrisBoard=[],tetrisPiece=null,tetrisNextPiece=null,tetrisScore=0;
 const TCOLS=10,TROWS=20;
@@ -1213,8 +1361,8 @@ async function loadQuizQ(){
     const si=text.indexOf('['),ei=text.lastIndexOf(']');if(si>=0&&ei>si)text=text.substring(si,ei+1);
     const qs=JSON.parse(text);const valid=qs.filter(q=>q.q&&Array.isArray(q.a)&&q.a.length===4&&typeof q.correct==='number');
     if(valid.length<3)throw new Error('bad');
-    quizState.questions=valid.slice(0,7);document.getElementById('quiz-loading').style.display='none';renderQ();
-  }catch(e){document.getElementById('quiz-loading').style.display='none';quizState.questions=fallback;renderQ();}
+    quizState.questions=valid.slice(0,7).sort(()=>Math.random()-0.5);document.getElementById('quiz-loading').style.display='none';renderQ();
+  }catch(e){document.getElementById('quiz-loading').style.display='none';quizState.questions=fallback.sort(()=>Math.random()-0.5);renderQ();}
 }
 function renderQ(){const area=document.getElementById('quiz-content');if(quizState.current>=quizState.questions.length){showQuizResult();return;}const q=quizState.questions[quizState.current];quizState.answered=false;area.innerHTML='<div class="quiz-timer"><div class="quiz-timer-bar" id="qtbar" style="width:100%"></div></div><div class="quiz-card"><div class="quiz-num">ВОПРОС '+(quizState.current+1)+'/'+quizState.questions.length+' · '+(q.pts||20)+' ОЧ</div><div class="quiz-q">'+esc(q.q)+'</div><div class="quiz-answers">'+q.a.map((a,i)=>'<button class="qa" onclick="answerQ('+i+')">'+esc(a)+'</button>').join('')+'</div></div><button class="quiz-next" id="qnext" onclick="nextQ()">СЛЕДУЮЩИЙ →</button>';startQTimer(20);}
 function startQTimer(sec){quizState.timerVal=sec;if(quizState.timer)clearInterval(quizState.timer);quizState.timer=setInterval(()=>{quizState.timerVal--;const b=document.getElementById('qtbar');if(b)b.style.width=(quizState.timerVal/sec*100)+'%';if(quizState.timerVal<=0){clearInterval(quizState.timer);if(!quizState.answered){quizState.answered=true;quizState.streak=0;const q=quizState.questions[quizState.current];document.querySelectorAll('.qa').forEach((btn,i)=>{btn.disabled=true;if(i===q.correct)btn.classList.add('correct');});const nb=document.getElementById('qnext');if(nb)nb.style.display='block';toast('Время!',true);}}},1000);}
@@ -1238,7 +1386,37 @@ function addChatBubble(role,text){const msgs=document.getElementById('chat-messa
 function addChatTyping(){const msgs=document.getElementById('chat-messages');if(!msgs)return;const div=document.createElement('div');div.className='chat-msg';div.id='chat-typing';div.innerHTML='<div class="chat-msg-ava ai">🤖</div><div class="chat-bubble ai"><div class="chat-typing"><span></span><span></span><span></span></div></div>';msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;}
 function removeChatTyping(){const t=document.getElementById('chat-typing');if(t)t.remove();}
 function sendQuick(text){document.getElementById('chat-input').value=text;sendChatMsg();}
-async function sendChatMsg(){const inp=document.getElementById('chat-input');const text=inp.value.trim();if(!text)return;inp.value='';const btn=document.getElementById('chat-send-btn');btn.disabled=true;addChatBubble('user',text);chatHistory.push({role:'user',content:text});addChatTyping();try{const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:CHAT_SYS[chatMode]||CHAT_SYS.squad,messages:chatHistory.slice(-12)})});const data=await resp.json();const reply=(data.content&&data.content[0]?data.content[0].text:'Извини, не смог ответить. Попробуй ещё раз!').trim();removeChatTyping();addChatBubble('ai',reply);chatHistory.push({role:'assistant',content:reply});if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);}catch(e){removeChatTyping();addChatBubble('ai','Ошибка соединения. Проверь интернет!');}btn.disabled=false;inp.focus();}
+async function sendChatMsg(){
+  const inp=document.getElementById('chat-input');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';
+  const btn=document.getElementById('chat-send-btn');
+  btn.disabled=true;
+  addChatBubble('user',text);
+  chatHistory.push({role:'user',content:text});
+  addChatTyping();
+  // Try server endpoint first, fallback to direct API
+  let replied=false;
+  if(!isFile){
+    try{
+      const r=await fetch(API+'/api/ai/chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':tok||''},body:JSON.stringify({message:text,mode:chatMode,history:chatHistory.slice(-10)})});
+      if(r.ok){const d=await r.json();if(d.reply){removeChatTyping();addChatBubble('ai',d.reply);chatHistory.push({role:'assistant',content:d.reply});replied=true;}}
+    }catch(e){}
+  }
+  if(!replied){
+    try{
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,system:CHAT_SYS[chatMode]||CHAT_SYS.squad,messages:chatHistory.slice(-12)})});
+      const data=await resp.json();
+      const reply=(data.content&&data.content[0]?data.content[0].text:'Не смог ответить. Попробуй ещё раз.').trim();
+      removeChatTyping();addChatBubble('ai',reply);
+      chatHistory.push({role:'assistant',content:reply});
+    }catch(e){removeChatTyping();addChatBubble('ai','⚠️ Ошибка соединения. Проверь интернет!');}
+  }
+  if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+  btn.disabled=false;inp.focus();
+}
+// alias for compatibility
+async function askAI(text,mode){chatMode=mode||chatMode;document.getElementById('chat-input').value=text||'';if(text)sendChatMsg();}
 
 function updatePtsDisplay(){document.getElementById('pts-display').textContent=myPoints;const sv=document.getElementById('shop-pts-val');if(sv)sv.textContent=myPoints;}
 function addPoints(pts){if(pts<=0)return;myPoints+=pts;localStorage.setItem('pl_points',myPoints);updatePtsDisplay();toast('+'+pts+' 🪙','s');}
