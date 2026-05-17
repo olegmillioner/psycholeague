@@ -34,7 +34,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         P.println("╔══════════════════════════════════════════╗");
-        P.println("║   PSYCHO LEAGUE  v7.0  ALL PHASES        ║");
+        P.println("║   PSYCHO LEAGUE        ALL PHASES        ║");
         P.println("║   Owner: luveniaw | Admin: Panda         ║");
         P.println("╚══════════════════════════════════════════╝");
         new File(DATA_DIR).mkdirs(); load(); seedIfEmpty();
@@ -81,6 +81,45 @@ public class Server {
 
         srv.createContext("/api/upload",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(getTok(ex)==null){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}try{byte[]raw=ex.getRequestBody().readAllBytes();if(raw.length>MAX_UPLOAD){respondJson(ex,413,"{\"error\":\"too large\"}");return;}String ct=ex.getRequestHeaders().getFirst("Content-Type");if(ct==null||!ct.contains("multipart/form-data")){respondJson(ex,400,"{\"error\":\"need multipart\"}");return;}String boundary=ct.split("boundary=")[1].trim();byte[]hSep="\r\n\r\n".getBytes(StandardCharsets.UTF_8);int hEnd=indexOf(raw,hSep);String headers=hEnd>0?new String(raw,0,hEnd,StandardCharsets.UTF_8):new String(raw,0,Math.min(1024,raw.length),StandardCharsets.UTF_8);String mt="image/jpeg";if(headers.contains("image/png"))mt="image/png";else if(headers.contains("image/gif"))mt="image/gif";else if(headers.contains("image/webp"))mt="image/webp";int ds=(hEnd>=0?hEnd:0)+hSep.length;byte[]eb=("\r\n--"+boundary+"--").getBytes(StandardCharsets.UTF_8);int de=lastIndexOf(raw,eb);if(de<0){byte[]eb2=("--"+boundary+"--").getBytes(StandardCharsets.UTF_8);de=lastIndexOf(raw,eb2)-2;}if(de<=ds){respondJson(ex,400,"{\"error\":\"parse\"}");return;}byte[]fd=Arrays.copyOfRange(raw,ds,de);respondJson(ex,200,"{\"ok\":true,\"url\":\"data:"+mt+";base64,"+Base64.getEncoder().encodeToString(fd)+"\"}");} catch(Exception e){respondJson(ex,500,"{\"error\":\"upload failed\"}");}});
 
+
+srv.createContext("/api/ai/chat", ex -> {
+            cors(ex);
+            // Проверка на OPTIONS для работы браузера
+            if ("OPTIONS".equals(ex.getRequestMethod())) {
+                respond(ex, 200, "text/plain", "");
+                return;
+            }
+            // Обработка самого сообщения
+            if ("POST".equals(ex.getRequestMethod())) {
+                try {
+                    // Читаем сообщение от пользователя
+                    String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                    // Ищем слово "message" в тексте (упрощенно)
+                    String userMsg = body.toLowerCase();
+                    String reply;
+
+                    if (userMsg.contains("тактик")) {
+                        reply = "Советник: Лучшая тактика сейчас — 4-3-2-1. Она дает контроль в центре поля!";
+                    } else if (userMsg.contains("состав") || userMsg.contains("сборк")) {
+                        reply = "Советник: Старайся делать гибриды из одной лиги для максимальной сыгранности!";
+                    } else if (userMsg.contains("очк") || userMsg.contains("pts")) {
+                        reply = "Советник: PTS можно заработать, побеждая в Квизе или турнирах!";
+                    } else {
+                        reply = "Советник: Привет! Я твой ИИ-помощник Psycho League. Спрашивай про тактику или составы!";
+                    }
+
+                    // Отправляем ответ в формате JSON
+                    String json = "{\"reply\":\"" + reply + "\"}";
+                    respondJson(ex, 200, json);
+                } catch (Exception e) {
+                    respondJson(ex, 500, "{\"error\":\"ai_error\"}");
+                }
+            } else {
+                respondJson(ex, 405, "{\"error\":\"Method Not Allowed\"}");
+            }
+        });
+
+
         srv.createContext("/api/admin/login",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String b=body(ex),user=strVal(b,"user"),pass=strVal(b,"pass");if(OWNER_USER.equals(user)&&OWNER_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","owner","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"owner\"}");return;}if(ADMIN_USER.equals(user)&&ADMIN_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}for(Map<String,Object>adm:ADMINS){if(s(adm,"login").equals(user)&&s(adm,"pass").equals(sha256(pass))){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}}respondJson(ex,401,"{\"error\":\"wrong\"}");});
 
         srv.createContext("/api/admin/news",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}if(!isMinAdmin(ex)){respondJson(ex,401,"{\"error\":\"unauth\"}");return;}String method=ex.getRequestMethod(),path=ex.getRequestURI().getPath();if("POST".equals(method)){Map<String,Object>n=parseObj(body(ex));int id=NID.getAndIncrement();n.put("id",id);if(!n.containsKey("date"))n.put("date",today());NEWS.add(0,n);save();broadcast("news","{\"title\":\""+jesc(s(n,"title"))+"\",\"id\":"+id+"}");respondJson(ex,200,"{\"ok\":true,\"id\":"+id+"}");}else if("PUT".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);Map<String,Object>upd=parseObj(body(ex));upd.put("id",id);for(int i=0;i<NEWS.size();i++){if(toInt(NEWS.get(i).get("id"))==id){Map<String,Object>m=new LinkedHashMap<>(NEWS.get(i));m.putAll(upd);NEWS.set(i,m);break;}}save();respondJson(ex,200,"{\"ok\":true}");}else if("DELETE".equals(method)){String[]pts=path.split("/");int id=toInt(pts[pts.length-1]);NEWS.removeIf(n->toInt(n.get("id"))==id);save();respondJson(ex,200,"{\"ok\":true}");}});
@@ -108,7 +147,7 @@ public class Server {
     static void save(){try{write(DATA_DIR+"/news.json",arrJson(NEWS));write(DATA_DIR+"/matches.json",arrJson(MATCHES));write(DATA_DIR+"/players.json",arrJson(PLAYERS));write(DATA_DIR+"/users.json",arrJson(USERS));write(DATA_DIR+"/apps.json",arrJson(APPLICATIONS));write(DATA_DIR+"/shop.json",arrJson(SHOP_ITEMS));write(DATA_DIR+"/scores.json",arrJson(SCORES));write(DATA_DIR+"/admins.json",arrJson(ADMINS));write(DATA_DIR+"/texts.json",objJson(SITE_TEXTS));write(DATA_DIR+"/posts.json",arrJson(POSTS));write(DATA_DIR+"/messages.json",arrJson(MESSAGES));write(DATA_DIR+"/tournaments.json",arrJson(TOURNAMENTS));write(DATA_DIR+"/match_results.json",arrJson(MATCH_RESULTS));}catch(Exception e){P.println("[SAVE] "+e.getMessage());}}
     static void load(){try{loadL(DATA_DIR+"/news.json",NEWS);}catch(Exception e){}try{loadL(DATA_DIR+"/matches.json",MATCHES);recalc();}catch(Exception e){}try{loadL(DATA_DIR+"/players.json",PLAYERS);}catch(Exception e){}try{loadL(DATA_DIR+"/users.json",USERS);}catch(Exception e){}try{loadL(DATA_DIR+"/apps.json",APPLICATIONS);}catch(Exception e){}try{loadL(DATA_DIR+"/shop.json",SHOP_ITEMS);}catch(Exception e){}try{loadL(DATA_DIR+"/scores.json",SCORES);}catch(Exception e){}try{loadL(DATA_DIR+"/admins.json",ADMINS);}catch(Exception e){}try{loadL(DATA_DIR+"/posts.json",POSTS);}catch(Exception e){}try{loadL(DATA_DIR+"/messages.json",MESSAGES);}catch(Exception e){}try{loadL(DATA_DIR+"/tournaments.json",TOURNAMENTS);}catch(Exception e){}try{loadL(DATA_DIR+"/match_results.json",MATCH_RESULTS);}catch(Exception e){}try{String txt=Files.readString(Path.of(DATA_DIR+"/texts.json"),StandardCharsets.UTF_8).trim();if(txt.startsWith("{"))SITE_TEXTS.putAll(parseObj(txt));}catch(Exception e){}NEWS.forEach(n->{int id=toInt(n.get("id"));if(id>=NID.get())NID.set(id+1);});MATCHES.forEach(m->{int id=toInt(m.get("id"));if(id>=MID.get())MID.set(id+1);});USERS.forEach(u->{int id=toInt(u.get("id"));if(id>=UID.get())UID.set(id+1);});POSTS.forEach(p->{int id=toInt(p.get("id"));if(id>=POSTID.get())POSTID.set(id+1);});MESSAGES.forEach(m->{int id=toInt(m.get("id"));if(id>=MSGID.get())MSGID.set(id+1);});P.println("[LOAD] users="+USERS.size()+" news="+NEWS.size()+" posts="+POSTS.size()+" msgs="+MESSAGES.size());}
     static void loadL(String path,List<Map<String,Object>>list)throws Exception{String txt=Files.readString(Path.of(path),StandardCharsets.UTF_8).trim();if(!txt.startsWith("[")||txt.length()<2)return;String inner=txt.substring(1,txt.length()-1).trim();if(inner.isEmpty())return;for(String chunk:topObjs(inner)){Map<String,Object>m=parseObj(chunk);if(!m.isEmpty())list.add(m);}}
-    static void seedIfEmpty(){if(NEWS.isEmpty()){mkN("🏆 Новый сезон!","Psycho League открывает новый сезон!","АНОНС","PaNdA");mkN("⚡ Рекорд!","240,712 голов!","РЕКОРД","PaNdA");mkN("👥 185 участников","Суммарно 185 активных!","НОВОСТЬ","Psycho");}if(MATCHES.isEmpty()){mkM("PaNdA","Psycho",5,2,"20.04.2026");mkM("Zenith","Kaiser",3,3,"21.04.2026");mkM("Titan","PaNdA",1,4,"22.04.2026");mkM("Psycho","Titan",6,0,"23.04.2026");recalc();}if(SHOP_ITEMS.isEmpty()){mkS("Временный Админ","Доступ к панели на 24 часа","👑",500,"admin_temp");mkS("VIP Статус","Метка рядом с ником","⭐",200,"vip");mkS("Кастомная карточка","Уникальный дизайн","🎨",300,"card");mkS("Эксклюзивный аватар","Редкий аватар","🔥",150,"avatar");mkS("Буст очков x2","Двойные очки в квизе","⚡",250,"boost");}if(SITE_TEXTS.isEmpty()){SITE_TEXTS.put("hero_sub","EA FC MOBILE · OFFICIAL COMMUNITY HUB");SITE_TEXTS.put("pl1_name","⚡ Psycho League · PaNdA");SITE_TEXTS.put("pl1_members","85");SITE_TEXTS.put("pl1_goals","240712");SITE_TEXTS.put("pl1_obr","12116");SITE_TEXTS.put("pl1_wins","161");SITE_TEXTS.put("pl2_name","🔥 Psycho League 2 · Psycho");SITE_TEXTS.put("pl2_members","100");SITE_TEXTS.put("pl2_goals","98871");SITE_TEXTS.put("pl2_obr","12061");SITE_TEXTS.put("pl2_wins","40");}save();}
+    static void seedIfEmpty(){if(NEWS.isEmpty()){mkN("🏆 Новый сезон!","Psycho League открывает новый сезон!","АНОНС","PaNdA");mkN("⚡ Рекорд!","240,712 голов!","РЕКОРД","PaNdA");mkN("👥 200 участников","Суммарно 185 активных!","НОВОСТЬ","Psycho");}if(MATCHES.isEmpty()){mkM("PaNdA","Psycho",5,2,"20.04.2026");mkM("Димитрий","Sharopuz",3,3,"21.04.2026");mkM("RANALDO","PaNdA",1,4,"22.04.2026");mkM("Psycho","Titan",6,0,"23.04.2026");recalc();}if(SHOP_ITEMS.isEmpty()){mkS("Временный Админ","Доступ к панели на 24 часа","👑",500,"admin_temp");mkS("VIP Статус","Метка рядом с ником","⭐",200,"vip");mkS("Кастомная карточка","Уникальный дизайн","🎨",300,"card");mkS("Эксклюзивный аватар","Редкий аватар","🔥",150,"avatar");mkS("Буст очков x2","Двойные очки в квизе","⚡",250,"boost");}if(SITE_TEXTS.isEmpty()){SITE_TEXTS.put("hero_sub","EA FC MOBILE · OFFICIAL COMMUNITY HUB");SITE_TEXTS.put("pl1_name","⚡ Psycho League · PaNdA");SITE_TEXTS.put("pl1_members","85");SITE_TEXTS.put("pl1_goals","240712");SITE_TEXTS.put("pl1_obr","12116");SITE_TEXTS.put("pl1_wins","161");SITE_TEXTS.put("pl2_name","🔥 Psycho League 2 · Psycho");SITE_TEXTS.put("pl2_members","100");SITE_TEXTS.put("pl2_goals","98871");SITE_TEXTS.put("pl2_obr","12061");SITE_TEXTS.put("pl2_wins","40");}save();}
     static void mkN(String t,String b,String c,String a){Map<String,Object>n=new LinkedHashMap<>();n.put("id",NID.getAndIncrement());n.put("title",t);n.put("body",b);n.put("category",c);n.put("author",a);n.put("date",today());NEWS.add(n);}
     static void mkM(String t1,String t2,int s1,int s2,String date){Map<String,Object>m=new LinkedHashMap<>();m.put("id",MID.getAndIncrement());m.put("team1",t1);m.put("team2",t2);m.put("score1",s1);m.put("score2",s2);m.put("date",date);MATCHES.add(m);}
     static void mkS(String name,String desc,String icon,int price,String type){Map<String,Object>i=new LinkedHashMap<>();i.put("id",SID.getAndIncrement());i.put("name",name);i.put("description",desc);i.put("icon",icon);i.put("price",price);i.put("type",type);SHOP_ITEMS.add(i);}
