@@ -83,41 +83,45 @@ public class Server {
 
 
 srv.createContext("/api/ai/chat", ex -> {
-            cors(ex);
-            // Проверка на OPTIONS для работы браузера
-            if ("OPTIONS".equals(ex.getRequestMethod())) {
-                respond(ex, 200, "text/plain", "");
-                return;
-            }
-            // Обработка самого сообщения
-            if ("POST".equals(ex.getRequestMethod())) {
-                try {
-                    // Читаем сообщение от пользователя
-                    String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                    // Ищем слово "message" в тексте (упрощенно)
-                    String userMsg = body.toLowerCase();
-                    String reply;
+    cors(ex);
+    if ("OPTIONS".equals(ex.getRequestMethod())) {
+        respond(ex, 200, "text/plain", "");
+        return;
+    }
+    if ("POST".equals(ex.getRequestMethod())) {
+        try {
+            String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            String userMsg = body.toLowerCase();
 
-                    if (userMsg.contains("тактик")) {
-                        reply = "Советник: Лучшая тактика сейчас — 4-3-2-1. Она дает контроль в центре поля!";
-                    } else if (userMsg.contains("состав") || userMsg.contains("сборк")) {
-                        reply = "Советник: Старайся делать гибриды из одной лиги для максимальной сыгранности!";
-                    } else if (userMsg.contains("очк") || userMsg.contains("pts")) {
-                        reply = "Советник: PTS можно заработать, побеждая в Квизе или турнирах!";
-                    } else {
-                        reply = "Советник: Привет! Я твой ИИ-помощник Psycho League. Спрашивай про тактику или составы!";
-                    }
+            // Массивы разных ответов
+            String[] tactics = {
+                "Советник: Сейчас в мете 4-3-2-1, она дает лучший контроль!",
+                "Советник: Попробуй 4-2-3-1, если любишь играть через фланги.",
+                "Советник: 4-4-2 — это классика, которая всегда работает в Psycho League!"
+            };
 
-                    // Отправляем ответ в формате JSON
-                    String json = "{\"reply\":\"" + reply + "\"}";
-                    respondJson(ex, 200, json);
-                } catch (Exception e) {
-                    respondJson(ex, 500, "{\"error\":\"ai_error\"}");
-                }
+            String[] common = {
+                "Советник: Привет! Я анализирую твой состав... Выглядит мощно!",
+                "Советник: Не забывай проходить квизы каждый день для фарма PTS.",
+                "Советник: Следи за сыгранностью, это ключ к победе в лиге!",
+                "Советник: Сегодня отличный день, чтобы затащить в турнире!"
+            };
+
+            java.util.Random rnd = new java.util.Random();
+            String reply;
+
+            if (userMsg.contains("тактик")) {
+                reply = tactics[rnd.nextInt(tactics.length)]; // Случайная тактика
             } else {
-                respondJson(ex, 405, "{\"error\":\"Method Not Allowed\"}");
+                reply = common[rnd.nextInt(common.length)];   // Случайная общая фраза
             }
-        });
+
+            respondJson(ex, 200, "{\"reply\":\"" + jesc(reply) + "\"}");
+        } catch (Exception e) {
+            respondJson(ex, 500, "{\"error\":\"ai_error\"}");
+        }
+    }
+});
 
 
         srv.createContext("/api/admin/login",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}String b=body(ex),user=strVal(b,"user"),pass=strVal(b,"pass");if(OWNER_USER.equals(user)&&OWNER_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","owner","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"owner\"}");return;}if(ADMIN_USER.equals(user)&&ADMIN_PASS.equals(pass)){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}for(Map<String,Object>adm:ADMINS){if(s(adm,"login").equals(user)&&s(adm,"pass").equals(sha256(pass))){String tok=genTok();TOKENS.put(tok,Map.of("role","admin","user",user,"ts",System.currentTimeMillis()));respondJson(ex,200,"{\"token\":\""+tok+"\",\"role\":\"admin\"}");return;}}respondJson(ex,401,"{\"error\":\"wrong\"}");});
