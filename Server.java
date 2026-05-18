@@ -32,14 +32,21 @@ public class Server {
     static PrintStream P;
     static{try{P=new PrintStream(System.out,true,"UTF-8");}catch(Exception e){P=System.out;}System.setOut(P);System.setErr(P);}
 
-    public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws Exception {
         P.println("╔══════════════════════════════════════════╗");
-        P.println("║   PSYCHO LEAGUE  v7.0  ALL PHASES        ║");
+        P.println("║   PSYCHO LEAGUE        ALL PHASES        ║");
         P.println("║   Owner: luveniaw | Admin: Panda         ║");
         P.println("╚══════════════════════════════════════════╝");
-        new File(DATA_DIR).mkdirs(); load(); seedIfEmpty();
-        HttpServer srv=HttpServer.create(new InetSocketAddress(PORT),256);
 
+        new File(DATA_DIR).mkdirs();
+        load();
+        seedIfEmpty();
+
+        // ОБНОВЛЕННЫЙ БЛОК:
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", String.valueOf(PORT)));
+        HttpServer srv = HttpServer.create(new InetSocketAddress(port), 256);
+
+        // Дальше идут твои контексты srv.createContext...
         srv.createContext("/",ex->{String p=ex.getRequestURI().getPath();if(p.startsWith("/api")){respond(ex,404,"text/plain","Not found");return;}if(p.equals("/")||p.equals("/index.html"))p="/index.html";if(p.contains("..")){respond(ex,403,"text/plain","Forbidden");return;}File f=new File("."+p);if(f.exists()&&f.isFile())respond(ex,200,mime(p),Files.readAllBytes(f.toPath()));else{File idx=new File("./index.html");if(idx.exists())respond(ex,200,"text/html; charset=utf-8",Files.readAllBytes(idx.toPath()));else respond(ex,404,"text/plain","404");}});
 
         srv.createContext("/api/auth/register",ex->{cors(ex);if("OPTIONS".equals(ex.getRequestMethod())){respond(ex,200,"text/plain","");return;}try{Map<String,Object>req=parseObj(body(ex));String login=s(req,"login").trim(),nick=s(req,"nick").trim(),pass=s(req,"pass");if(login.isEmpty()||nick.isEmpty()||pass.length()<4){respondJson(ex,400,"{\"error\":\"Заполни все поля\"}");return;}boolean taken=USERS.stream().anyMatch(u->s(u,"login").equalsIgnoreCase(login))||OWNER_USER.equalsIgnoreCase(login)||ADMIN_USER.equalsIgnoreCase(login)||ADMINS.stream().anyMatch(a->s(a,"login").equalsIgnoreCase(login));if(taken){respondJson(ex,409,"{\"error\":\"Логин занят\"}");return;}Map<String,Object>u=new LinkedHashMap<>();u.put("id",UID.getAndIncrement());u.put("login",login);u.put("nick",nick);u.put("passHash",sha256(pass));u.put("points",0);u.put("role","user");u.put("avatar","⚽");u.put("status","");u.put("date",today());u.put("purchases",new ArrayList<>());u.put("cart",new ArrayList<>());USERS.add(u);save();respondJson(ex,200,"{\"ok\":true}");P.println("[REG] "+nick+"("+login+")");}catch(Exception e){respondJson(ex,400,"{\"error\":\"Ошибка регистрации\"}");}});
